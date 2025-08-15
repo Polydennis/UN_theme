@@ -1,0 +1,270 @@
+{% style %}
+  /* Hintergrundfarbe für den gesamten Abschnitt */
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.background_color }};
+  }
+
+  /* Überschrift im Abschnitt – angepasst an Dawn’s Section-Header */
+  #shopify-section-{{ section.id }} .section-header__heading {
+    color: {{ section.settings.heading_color }};
+  }
+
+  /* Padding für den Abschnitt (mobile) */
+  #shopify-section-{{ section.id }} .section {
+    padding-top: {{ section.settings.section_spacing_mobile }}px;
+    padding-bottom: {{ section.settings.section_spacing_mobile }}px;
+  }
+
+  /* Padding für den Abschnitt (Desktop) */
+  @media screen and (min-width: 720px) {
+    #shopify-section-{{ section.id }} .section {
+      padding-top: {{ section.settings.section_spacing_desktop }}px;
+      padding-bottom: {{ section.settings.section_spacing_desktop }}px;
+    }
+  }
+
+  /* Subheading-Farbe */
+  #shopify-section-{{ section.id }} .section-header__subheading {
+    color: {{ section.settings.subheading_color }};
+  }
+{% endstyle %}
+
+{% comment %}
+  1) Metafeld auslesen: article.metafields.custom.related_articles.value
+  2) Die Handles zu einer Komma-getrennten Liste zusammenfügen
+{% endcomment %}
+{% assign related_articles_handles = "" %}
+{% for handle in article.metafields.custom.related_articles.value %}
+  {% assign related_articles_handles = related_articles_handles | append: handle | append: "," %}
+{% endfor %}
+{% assign related_articles_handles = related_articles_handles | remove_last: "," %}
+
+{% if section.settings.debug %}
+  <!-- Debug: Eingelesene Daten -->
+  <div class="debug-info" style="background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+    <h4>Debug-Informationen:</h4>
+    <p><strong>related_articles_handles:</strong> {{ related_articles_handles }}</p>
+    <p><strong>Blog (section.settings.blog):</strong> {{ section.settings.blog }}</p>
+  </div>
+{% endif %}
+
+{% if related_articles_handles != blank %}
+  <script
+    type="application/json"
+    data-section-id="{{ section.id }}"
+    data-section-type="dynamic-blog-posts">
+  </script>
+
+  <section class="section">
+    <div class="container">
+      {% if section.settings.title or section.settings.subheading %}
+        <header class="section-header">
+          {% if section.settings.title != blank %}
+            <h2 class="section-header__heading">
+              {{ section.settings.title | escape }}
+            </h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <div class="section-header__subheading">
+              {{ section.settings.subheading }}
+            </div>
+          {% endif %}
+        </header>
+      {% endif %}
+
+      {% assign related_handles_array = related_articles_handles | split: "," %}
+      {% assign blog_handle = section.settings.blog %}
+      {% assign rendered_articles = "" %}  {# Variable zum Speichern bereits gerenderter Artikel-ID #}
+
+      {% if section.settings.debug %}
+        <!-- Debug: Array der Related-Handles und alle Artikel im Blog -->
+        <div class="debug-info" style="background-color: #eef; border: 1px solid #99c; padding: 10px; margin-bottom: 10px;">
+          <h4>Debug – Iteration:</h4>
+          <p><strong>Related handles array:</strong> {{ related_handles_array | join: ", " }}</p>
+        </div>
+
+        <div class="debug-info" style="background-color: #ffd; border: 1px solid #cc9; padding: 10px; margin-bottom: 10px;">
+          <h4>Debug – Alle Artikel im Blog "{{ blog_handle }}"</h4>
+          {% for debug_article in blogs[blog_handle].articles %}
+            <p>• {{ debug_article.title }} (<strong>{{ debug_article.handle }}</strong>)</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <ul class="article-list">
+        {% comment %}
+          Für jeden gewünschten Handle durchsuchen wir alle Artikel des Blogs.
+          Mit der Variable rendered_articles wird sichergestellt, dass ein Artikel nur einmal ausgegeben wird.
+        {% endcomment %}
+        {% for handle in related_handles_array %}
+          {% assign handle_stripped = handle | strip %}
+          {% if section.settings.debug %}
+            <li style="list-style: none; font-size: 0.9em; color: #555;">
+              Verarbeite Handle: <strong>{{ handle_stripped }}</strong>
+            </li>
+          {% endif %}
+
+          {% for related_article in blogs[blog_handle].articles %}
+            {%- comment -%}
+              Entferne den Blog-Präfix aus dem Artikelhandle.
+              Beispiel: "trends/minimalismus-trifft-wand-..."
+              wird zu "minimalismus-trifft-wand-..."
+            {%- endcomment -%}
+            {% assign clean_article_handle = related_article.handle | remove: blog_handle | remove_first: "/" | strip %}
+
+            {% if section.settings.debug %}
+              <li style="list-style:none; font-size: 0.9em; color: #999;">
+                Vergleiche: '{{ clean_article_handle }}' == '{{ handle_stripped }}' ?
+              </li>
+            {% endif %}
+
+            {% if clean_article_handle == handle_stripped %}
+              {%- comment -%}
+                Falls der Artikel bereits gerendert wurde, überspringe ihn.
+              {%- endcomment -%}
+              {% if rendered_articles contains related_article.id %}
+                {% if section.settings.debug %}
+                  <li style="list-style:none; font-size: 0.9em; color: orange;">
+                    Artikel "{{ related_article.title }}" bereits gerendert.
+                  </li>
+                {% endif %}
+                {% continue %}
+              {% endif %}
+
+              {% assign rendered_articles = rendered_articles | append: related_article.id | append: "," %}
+              
+              {% if section.settings.debug %}
+                <li style="list-style:none; font-size: 0.9em; color: green;">
+                  Gefunden: Artikel &quot;{{ related_article.title }}&quot; (Handle: {{ clean_article_handle }})
+                </li>
+              {% endif %}
+
+              {% render 'article-card',
+                blog: section.settings.blog,
+                article: related_article,
+                media_aspect_ratio: 1.66,
+                show_image: true,
+                show_date: false,
+                show_author: false,
+                show_excerpt: true
+              %}
+
+              {%- comment -%}
+                Sobald ein Artikel zu einem Handle gefunden und gerendert wurde,
+                können wir die innere Schleife abbrechen.
+              {%- endcomment -%}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+{% else %}
+  <!-- Keine Related-Handles => Abschnitt ausblenden -->
+  <style>
+    #shopify-section-{{ section.id }} {
+      display: none;
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Related Articles",
+  "class": "blogposts--section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Related Articles"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Section heading color",
+      "default": "#4D4D4D"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Section subheading color",
+      "default": "#4D4D4D"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background color"
+    },
+    {
+      "type": "range",
+      "id": "section_spacing_desktop",
+      "label": "Desktop section spacing",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "section_spacing_mobile",
+      "label": "Mobile section spacing",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show date published",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show post author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show post excerpt",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "debug",
+      "label": "Debug Mode aktivieren",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "category": "Blog",
+      "name": "Related Articles",
+      "settings": {
+        "blog": "none"
+      }
+    }
+  ],
+  "enabled_on": {
+    "templates": [
+      "article"
+    ]
+  }
+}
+{% endschema %}

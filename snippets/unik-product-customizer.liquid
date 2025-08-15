@@ -1,0 +1,57 @@
+<section id="unik-customizer" class="page-width">
+  <div class="grid grid--2-col">
+    <div>
+      <h2>Maße</h2>
+      <div class="field">
+        <label for="unik-width">Breite (cm)</label>
+        <input id="unik-width" type="number" min="50" step="0.1" value="5" />
+      </div>
+      <div class="field">
+        <label for="unik-height">Höhe (cm)</label>
+        <input id="unik-height" type="number" min="50" step="0.1" value="3" />
+      </div>
+
+      <div class="field">
+        <label for="unik-strip">Bahnbreite (cm)</label>
+        <input id="unik-strip" type="number" min="30" step="1" value="50" />
+      </div>
+
+      <div class="unik-dpi-status" id="unik-dpi-status">DPI: –</div>
+
+      <button id="unik-save-config" class="button">Ausschnitt speichern</button>
+    </div>
+
+    <div>
+      <h2>Vorschau</h2>
+      <div id="unik-stage-wrap" style="border:1px solid #ddd; width:100%; max-width:800px; aspect-ratio: 5 / 3; background:#f9f9f9"></div>
+      <div class="helper-text">Ziehe das Motiv und zoome mit dem Mausrad oder Pinch</div>
+    </div>
+  </div>
+
+  <form method="post" action="/cart/add" id="unik-atc-form">
+    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" />
+    <input type="hidden" name="properties[_configId]" id="unik-configId" />
+    <input type="hidden" name="properties[_configUrl]" id="unik-configUrl" />
+    <input type="hidden" name="properties[Breite]" id="unik-prop-width" />
+    <input type="hidden" name="properties[Höhe]" id="unik-prop-height" />
+    <input type="hidden" name="properties[Bahnbreite]" id="unik-prop-strip" />
+    <button type="submit" class="button" id="unik-atc" disabled>In den Warenkorb</button>
+  </form>
+
+  <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+  <script>
+    window.UNIK_PRODUCT = {
+      id: {{ product.id }},
+      handle: {{ product.handle | json }},
+      title: {{ product.title | json }},
+      preview: {{ product.featured_image | image_url: width: 4096 | json }},
+      // Optional: Metafields mit Original‑Referenz (nur Info, Rendering macht der Server)
+      metafields: {
+        master_key: {{ product.metafields.custom.master_image | json }},
+        preview_key: {{ product.metafields.custom.preview_image | json }}
+      }
+    };
+  </script>
+  <script src="{{ 'customizer.js' | asset_url }}" defer></script>
+</section> 
+<script src="{{ 'assets/customizer.js' | asset_url }}"></script>

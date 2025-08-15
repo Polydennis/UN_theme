@@ -1,0 +1,404 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "custom_liquid_g7RAqE": {
+      "type": "custom-liquid",
+      "disabled": true,
+      "settings": {
+        "custom_liquid": "<div class=\"page-hero__outer page-width scroll-trigger animate--fade-in\">\n    <div style=\"padding: 5px; background-color: #BCB2A8\">\n        <div class=\"category-header\" style=\"position: relative;\">\n            <style>\n                .category-header {\n                    {% if page.image %}\n                    background: url('{{ page.image | img_url: '1024x1024' }}') no-repeat center center;\n                    background-size: cover;\n                    {% endif %}\n                    min-height: 200px;\n                    display: flex;\n                    align-items: center;\n                    justify-content: center;\n                    position: relative;\n                }\n                .category-header h1 {\n                    font-family: 'Bon Voyage Regular', serif;\n                    font-size: clamp(2em, 5vw, 3em);\n                    font-weight: 500;\n                    text-transform: uppercase;\n                    letter-spacing: 2px;\n                    color: #ffffff;\n                    text-shadow: 2px 2px 2px #595959;\n                    background-color: rgba(191,159,134,0.6);\n                    padding: 10px 10px 0;\n                    text-align: center;\n                    margin-left: min(1em, 20vw);\n                    margin-right: min(1em, 20vw);\n                    max-width: 100%;\n                    position: relative;\n                    z-index: 2;\n                }\n            </style>\n            <h1>{{ page.title }}</h1>\n        </div>\n    </div>\n    <div class=\"page-hero__text-wrapper rte\" style=\"margin-top:1em;\">\n        <div class=\"page-hero__description rte center\">\n            {{ page.content }}\n        </div>\n    </div>\n</div>",
+        "color_scheme": "",
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "custom_css": [
+        "h1,h2,h3 {font-family: \"Bon Voyage Regular\", serif; text-transform: uppercase;}"
+      ],
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "rich_text_hTUT36": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_Tgzk4W": {
+          "type": "heading",
+          "settings": {
+            "heading": "Tapeten für jeden Stil",
+            "heading_size": "h1"
+          }
+        },
+        "text_bFVE6F": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Dein Zuhause ist so einzigartig wie du – und genau so sollte es auch aussehen. Ob gemütliches Schlafzimmer, kreatives Homeoffice oder lebendige Küche: Unsere Tapeten bringen Stil, Persönlichkeit und Atmosphäre in jeden Bereich deines Zuhauses.<br/><br/></p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_Tgzk4W",
+        "text_bFVE6F"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "left",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 28,
+        "padding_bottom": 0
+      }
+    },
+    "collection_list_rX7iYp": {
+      "type": "collection-list",
+      "blocks": {
+        "featured_collection_gjm9fe": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-wohnzimmer"
+          }
+        },
+        "featured_collection_TzEE7L": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-babyzimmer"
+          }
+        },
+        "featured_collection_mUDPpW": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-buero"
+          }
+        },
+        "featured_collection_WjQa3i": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-esszimmer"
+          }
+        },
+        "featured_collection_EaEag6": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-flur-oder-diele"
+          }
+        },
+        "featured_collection_hmRC4n": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-kinderzimmer"
+          }
+        },
+        "featured_collection_X3bgEi": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-kueche"
+          }
+        },
+        "featured_collection_6C9kFN": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-schlafzimmer"
+          }
+        },
+        "featured_collection_8yx4EG": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tapete-badezimmer-klo"
+          }
+        }
+      },
+      "block_order": [
+        "featured_collection_gjm9fe",
+        "featured_collection_TzEE7L",
+        "featured_collection_mUDPpW",
+        "featured_collection_WjQa3i",
+        "featured_collection_EaEag6",
+        "featured_collection_hmRC4n",
+        "featured_collection_X3bgEi",
+        "featured_collection_6C9kFN",
+        "featured_collection_8yx4EG"
+      ],
+      "settings": {
+        "title": "",
+        "heading_size": "h2",
+        "image_ratio": "square",
+        "columns_desktop": 3,
+        "color_scheme": "",
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "rich_text_p4WXUH": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_n8rtYi": {
+          "type": "heading",
+          "settings": {
+            "heading": "Tapeten für jeden Stil",
+            "heading_size": "h1"
+          }
+        },
+        "text_Vfd4yx": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ob minimalistisch, modern, vintage, klassisch, industriell oder verspielt – unsere Tapetenkollektion bietet für jede Stilrichtung das passende Design. Entdecke zeitlose Eleganz, kreative Muster und angesagte Trends für dein Zuhause.<br/><br/></p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_n8rtYi",
+        "text_Vfd4yx"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "left",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 28,
+        "padding_bottom": 0
+      }
+    },
+    "collection_list_bdcGKX": {
+      "type": "collection-list",
+      "blocks": {
+        "featured_collection_79VC3m": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "abstrakte-tapeten"
+          }
+        },
+        "featured_collection_tQEGFQ": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "aquarelltapeten"
+          }
+        },
+        "featured_collection_YkwrYz": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "blumentapeten"
+          }
+        },
+        "featured_collection_kPEPHy": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "dschungeltapeten"
+          }
+        },
+        "featured_collection_dFyckA": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "art-collection"
+          }
+        },
+        "featured_collection_jEKgim": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "marmor-steintapeten"
+          }
+        },
+        "featured_collection_xLP6jK": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "naturtapeten"
+          }
+        },
+        "featured_collection_zpXbHE": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "vintagetapeten"
+          }
+        },
+        "featured_collection_C8pDqX": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "waldtapeten"
+          }
+        }
+      },
+      "block_order": [
+        "featured_collection_79VC3m",
+        "featured_collection_tQEGFQ",
+        "featured_collection_YkwrYz",
+        "featured_collection_kPEPHy",
+        "featured_collection_dFyckA",
+        "featured_collection_jEKgim",
+        "featured_collection_xLP6jK",
+        "featured_collection_zpXbHE",
+        "featured_collection_C8pDqX"
+      ],
+      "settings": {
+        "title": "",
+        "heading_size": "h2",
+        "image_ratio": "square",
+        "columns_desktop": 3,
+        "color_scheme": "",
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 0,
+        "padding_bottom": 36
+      }
+    },
+    "rich_text_gtYRBb": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_Lgq4mV": {
+          "type": "heading",
+          "settings": {
+            "heading": "Für unsere Kinder",
+            "heading_size": "h1"
+          }
+        },
+        "text_PFiKnP": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Das Zimmer deines Kindes hat es verdient, ein Ort voller Fantasie zu sein.<br/><br/>Ob verspielte Tiermotive, bunte Abenteuerwelten, zauberhafte Märchenbilder oder coole Designs für kleine Entdecker – unsere Kindertapeten bringen Leben an die Wand und lassen Kinderträume wahr werden.<br/><br/></p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_Lgq4mV",
+        "text_PFiKnP"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "left",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 28,
+        "padding_bottom": 0
+      }
+    },
+    "collection_list_BHKCHm": {
+      "type": "collection-list",
+      "blocks": {
+        "featured_collection_c94wkD": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "himmeltapeten-fur-kinder"
+          }
+        },
+        "featured_collection_p6BgB4": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "naturtapeten-fur-kinderzimmer"
+          }
+        },
+        "featured_collection_RhmtHQ": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tiertapeten-fur-kinder"
+          }
+        }
+      },
+      "block_order": [
+        "featured_collection_c94wkD",
+        "featured_collection_p6BgB4",
+        "featured_collection_RhmtHQ"
+      ],
+      "settings": {
+        "title": "",
+        "heading_size": "h2",
+        "image_ratio": "square",
+        "columns_desktop": 3,
+        "color_scheme": "",
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "rich_text_fyqqHf": {
+      "type": "rich-text",
+      "blocks": {
+        "button_7tXp7Q": {
+          "type": "button",
+          "settings": {
+            "button_label": "Zu allen Kindertapeten",
+            "button_link": "shopify://collections/kindertapeten",
+            "button_style_secondary": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "button_7tXp7Q"
+      ],
+      "custom_css": [
+        "div {padding: 0; margin: 0;}"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 0,
+        "padding_bottom": 52
+      }
+    },
+    "04fc0b06-f489-400c-862a-3d6269ce018b": {
+      "type": "featured-collection",
+      "custom_css": [
+        "h1,h2 {font-family: \"Hunter\", serif; text-transform: uppercase;}"
+      ],
+      "settings": {
+        "collection": "alle-tapeten",
+        "products_to_show": 4,
+        "title": "Bestseller",
+        "heading_size": "h1",
+        "description": "",
+        "show_description": false,
+        "description_style": "body",
+        "columns_desktop": 4,
+        "enable_desktop_slider": false,
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "color_scheme": "",
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": false,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "columns_mobile": "2",
+        "swipe_on_mobile": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "custom_liquid_g7RAqE",
+    "main",
+    "rich_text_hTUT36",
+    "collection_list_rX7iYp",
+    "rich_text_p4WXUH",
+    "collection_list_bdcGKX",
+    "rich_text_gtYRBb",
+    "collection_list_BHKCHm",
+    "rich_text_fyqqHf",
+    "04fc0b06-f489-400c-862a-3d6269ce018b"
+  ]
+}

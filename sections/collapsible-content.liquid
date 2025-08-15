@@ -29,7 +29,10 @@
             </p>
           {% endif %}
           {%- if section.settings.heading != blank -%}
-            <h2 class="collapsible-content__heading inline-richtext {{ section.settings.heading_size }}">
+            <h2
+              id="{{ section.settings.heading_id | escape | handle }}"
+              class="collapsible-content__heading inline-richtext {{ section.settings.heading_size }}"
+            >
               {{ section.settings.heading }}
             </h2>
           {%- else -%}
@@ -151,7 +154,7 @@
           "label": "t:sections.all.heading_size.options__5.label"
         }
       ],
-      "default": "h1",
+      "default": "h2",
       "label": "t:sections.all.heading_size.label"
     },
     {
@@ -177,7 +180,13 @@
     {
       "type": "header",
       "content": "t:sections.collapsible_content.settings.layout_header.content"
-    },    
+    },
+    {
+      "type": "text",
+      "id": "heading_id",
+      "label": "Anchor-ID für Überschrift",
+      "default": "faq-heading"
+    },
     {
       "type": "select",
       "id": "layout",
@@ -203,7 +212,7 @@
       "id": "container_color_scheme",
       "label": "t:sections.collapsible_content.settings.container_color_scheme.label",
       "default": "scheme-2"
-    },    
+    },
     {
       "type": "color_scheme",
       "id": "color_scheme",

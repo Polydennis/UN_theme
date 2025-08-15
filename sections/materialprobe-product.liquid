@@ -1,0 +1,197 @@
+{% comment %}
+  Section: Materialprobe Complementary
+  Diese Section zeigt als complementary product den passenden Materialprobe-Eintrag an.
+  Logik:
+  - Falls das Produkthandle "tapete" enthält:
+    - Wir speichern in der Variable "prefix" die ersten 7 Zeichen.
+    - Wenn "prefix" gleich "muster-" ist, handelt es sich bereits um das Musterprodukt:
+      → Ermittele den Hauptprodukt-Handle (indem "muster-" entfernt wird) und zeige einen Button "Zum Hauptprodukt".
+    - Andernfalls:
+      → Erstelle den Handle "muster-[product.handle]" und lade das Musterprodukt via all_products.
+      → Falls vorhanden, werden Bild, Titel, Preis und ein Add-to-Cart Formular angezeigt.
+      → Falls nicht, wird ein Hinweis mit einem Link zur Kontaktseite ausgegeben.
+  - Für Produkte, bei denen "tapete" nicht enthalten ist, wird eine Standardmeldung ausgegeben.
+{% endcomment %}
+
+{% capture sample_html %}
+  {% if product.handle contains "tapete" %}
+    {% assign prefix = product.handle | slice: 0, 7 %}
+    {% if prefix == "muster-" %}
+      {% assign main_handle = product.handle | remove: "muster-" %}
+      <div class="sample-product">
+         <a href="/products/{{ main_handle }}" class="sample-product__link">
+           {% if product.featured_image %}
+             <img src="{{ product.featured_image | img_url: 'small' }}" alt="{{ product.title }}" class="sample-product__image">
+           {% endif %}
+         </a>
+         <div class="sample-product__info">
+           <h3 class="sample-product__title">{{ product.title }}</h3>
+           <p class="sample-product__price">{{ product.price | money }}</p>
+           <a href="/products/{{ main_handle }}" class="button">Zum Hauptprodukt</a>
+         </div>
+      </div>
+    {% else %}
+      {% assign sample_handle = 'muster-' | append: product.handle %}
+      {% assign sample_product = all_products[sample_handle] %}
+      {% if sample_product %}
+        <div class="sample-product">
+           <a href="{{ sample_product.url }}" class="sample-product__link">
+             {% if sample_product.featured_image %}
+               <img src="{{ sample_product.featured_image | img_url: 'small' }}" alt="{{ sample_product.title }}" class="sample-product__image">
+             {% else %}
+               <img src="{{ 'placeholder.jpg' | asset_url }}" alt="{{ sample_product.title }}" class="sample-product__image">
+             {% endif %}
+           </a>
+           <div class="sample-product__info">
+             <h3 class="sample-product__title">{{ sample_product.title }}</h3>
+             <p class="sample-product__price">{{ sample_product.price | money }}</p>
+             <form action="/cart/add" method="post" class="sample-product__form">
+               <input type="hidden" name="id" value="{{ sample_product.variants.first.id }}">
+               <button type="submit" class="sample-product__buy-button">In den Warenkorb</button>
+             </form>
+           </div>
+        </div>
+      {% else %}
+        <div class="no-sample">
+           <p>Du möchtest eine Materialprobe mit diesem Motiv? Dann <a href="/kontakt">schreib uns gern eine Nachricht!</a></p>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% else %}
+    <div class="no-sample">
+      <p>Keine Materialprobe verfügbar.</p>
+    </div>
+  {% endif %}
+{% endcapture %}
+
+<product-recommendations
+  class="complementary-products sample-complementary-products"
+  data-section="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+>
+  <aside aria-label="{{ 'accessibility.complementary_products' | t }}">
+    <div class="complementary-products__container">
+      <details id="Details-{{ section.id }}" open>
+        <summary>
+          <div class="summary__title">
+            <h2 class="h3">Materialprobe</h2>
+          </div>
+          {{ 'icon-caret.svg' | inline_asset_content }}
+        </summary>
+        <slideshow-component class="slider-mobile-gutter">
+          <div
+            id="Slider-{{ section.id }}"
+            class="complementary-slider grid grid--1-col slider slider--everywhere"
+            role="list"
+            aria-label="{{ 'general.slider.name' | t }}"
+          >
+            <div
+              class="complementary-slide grid__item slider__slide slideshow__slide"
+              tabindex="-1"
+              role="group"
+              aria-roledescription="{{ 'sections.slideshow.slide' | t }}"
+              aria-label="1 von 1"
+            >
+              <ul class="list-unstyled" role="list">
+                <li>
+                  {{ sample_html | strip }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          {%- comment -%} Bei nur einem Slide sind keine Slider-Buttons erforderlich {%- endcomment -%}
+        </slideshow-component>
+      </details>
+    </div>
+  </aside>
+</product-recommendations>
+
+{% schema %}
+{
+  "name": "Materialprobe",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Farbschema",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36,
+      "label": "Abstand oben"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36,
+      "label": "Abstand unten"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "complementary",
+      "name": "Complementary",
+      "settings": [
+        {
+          "type": "text",
+          "id": "block_heading",
+          "default": "Materialprobe",
+          "label": "Block Überschrift"
+        },
+        {
+          "type": "checkbox",
+          "id": "make_collapsible_row",
+          "default": false,
+          "label": "Collapsible Row aktivieren"
+        },
+        {
+          "type": "select",
+          "id": "pagination_style",
+          "options": [
+            {
+              "value": "dots",
+              "label": "Dots"
+            },
+            {
+              "value": "counter",
+              "label": "Counter"
+            },
+            {
+              "value": "numbers",
+              "label": "Numbers"
+            }
+          ],
+          "default": "counter",
+          "label": "Paginierung"
+        },
+        {
+          "type": "range",
+          "id": "product_list_limit",
+          "min": 1,
+          "max": 10,
+          "step": 1,
+          "default": 1,
+          "label": "Anzahl Produkte"
+        }
+      ],
+      "limit": 1
+    }
+  ],
+  "presets": [
+    {
+      "name": "Materialprobe Complementary",
+      "category": "Produkt"
+    }
+  ]
+}
+{% endschema %}

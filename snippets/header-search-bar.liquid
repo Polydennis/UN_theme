@@ -1,0 +1,140 @@
+{% comment %}
+  Always visible search bar by ezfycode.com
+{% endcomment %}
+
+{% assign predictive_search_height = 500 %}
+{% assign search_box_width = 350 %}
+
+<div class="EzfyHeaderSearch EzfyHeaderSearch--{{ device }}">
+  {%- if settings.predictive_search_enabled -%}
+    <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+  {%- else -%}
+    <search-form class="search-modal__form">
+  {%- endif -%}
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+    <div class="field">
+      <input
+        class="search__input field__input"
+        id="{{ input_id }}"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'general.search.search' | t }}"
+        {%- if settings.predictive_search_enabled -%}
+          role="combobox"
+          aria-expanded="false"
+          aria-owns="predictive-search-results"
+          aria-controls="predictive-search-results"
+          aria-haspopup="listbox"
+          aria-autocomplete="list"
+          autocorrect="off"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        {%- endif -%}
+      >
+      <label class="field__label" for="{{ input_id }}">{{ 'general.search.search' | t }}</label>
+      <input type="hidden" name="options[prefix]" value="last">
+      <button
+        type="reset"
+        class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"
+        aria-label="{{ 'general.search.reset' | t }}"
+      >
+        <svg class="icon icon-close" aria-hidden="true" focusable="false">
+          <use xlink:href="#icon-reset">
+        </svg>
+      </button>
+      <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+        <svg class="icon icon-search" aria-hidden="true" focusable="false">
+          <use href="#icon-search">
+        </svg>
+      </button>
+    </div>
+
+    {%- if settings.predictive_search_enabled -%}
+      <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+        <div class="predictive-search__loading-state">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="spinner"
+            viewBox="0 0 66 66"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+    {%- endif -%}
+  </form>
+  {%- if settings.predictive_search_enabled -%}
+    </predictive-search>
+  {%- else -%}
+    </search-form>
+  {%- endif -%}
+</div>
+
+<style>
+/* mobile */
+@media (max-width: 990px){
+  .EzfyHeaderSearch--mobile{
+  display: block;
+  }
+  
+  .EzfyHeaderSearch--desktop{
+  display: none;
+  }
+  
+  .EzfyHeaderSearch--mobile  {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 10px;
+  margin-top: 20px;
+  }
+  
+  body{
+  overflow-x: hidden;
+  }
+
+  [id] .header{
+     display:flex !important;
+  flex-wrap: wrap;
+  justify-content:space-between;
+}
+
+
+}
+
+/* desktop */
+@media (min-width: 991px){
+  .EzfyHeaderSearch--mobile{
+  display: none !important;
+  }
+  
+  .EzfyHeaderSearch--desktop{
+  display: block;
+  }
+  
+  .predictive-search__results-groups-wrapper{
+  flex-direction: column !important;
+  }
+  
+  .search-modal__form,
+  .search-modal__form > *{
+  width: {{ search_box_width }}px !important;
+  max-width: 100% !important;
+  }
+  
+  .predictive-search{
+  max-height: {{ predictive_search_height }}px !important;
+  }
+
+}
+</style>
+<script>
+  
+  (() => {var e=["background: linear-gradient(-47deg,#8731e8,#4528dc)","border: 1px solid #3E0E02","color: white","display: block","text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3)","box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 5px 3px -5px rgba(0, 0, 0, 0.5), 0 -13px 5px -10px rgba(255, 255, 255, 0.4) inset","line-height: 40px","text-align: center","font-weight: bold","padding: 0px 5px"].join(";");function r(e){return(e+"").replace(/&#\d+;/gm,function(e){return String.fromCharCode(e.match(/\d+/gm)[0])})}var n=r(`&#87;&#101;&#98;&#115;&#105;&#116;&#101;&#32;&#112;&#111;&#119;&#101;&#114;&#101;&#100;&#32;&#98;&#121;&#32;&#104;&#116;&#116;&#112;&#115;&#58;&#47;&#47;&#101;&#122;&#102;&#121;&#99;&#111;&#100;&#101;&#46;&#99;&#111;&#109;`);console.log(`%c ${n}`,e);})()
+
+</script>

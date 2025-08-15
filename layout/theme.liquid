@@ -296,6 +296,7 @@
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
+    {% render 'abpilot-ui-sdk' %}
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
@@ -372,5 +373,38 @@
     {%- if settings.cart_type == 'drawer' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+
+    <!-- Hotjar Tracking Code for https://unik-nordic.com/ -->
+    <script>
+      (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:3295628,hjsv:6};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+      })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+
+    {% comment %}
+      REPLYCO CHAT
+    {% endcomment %}
+    <div id="replycoChat"></div>
+    <script>
+      (function(){
+        window.replycoChat=window.replycoChat||function(){(window.replycoChat=window.replycoChat||[]).push(arguments)};
+        window.replycoChat.data = {
+          widgetId: "1e5c9add-71d1-45bb-9f01-08dce6f50014"
+        };
+        var a = document.getElementsByTagName('head')[0];
+        var r = document.createElement('script');r.async=1;
+        r.src = "https://app.replyco.com/extensions/widget.js";
+        a.appendChild(r);
+      })();
+    </script>
+
+    {% comment %}
+      REPLYCO CHAT END
+    {% endcomment %}
   </body>
 </html>

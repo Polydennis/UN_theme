@@ -1,0 +1,69 @@
+{% comment %}
+  Custom Breadcrumb Navigation Section for PDP with Schema
+{% endcomment %}
+
+<nav aria-label="Breadcrumb" class="breadcrumb page-width">
+  <ol class="breadcrumb__list">
+    <li class="breadcrumb__item">
+      <a href="{{ routes.root_url }}">Home</a>
+    </li>
+
+    {% if product.collections.size > 0 %}
+      <!-- Trenner direkt als List-Item -->
+      <li class="breadcrumb__separator">{{ section.settings.breadcrumb_separator }}</li>
+      <li class="breadcrumb__item">
+        <a href="{{ product.collections.first.url }}">
+          {{ product.collections.first.title }}
+        </a>
+      </li>
+    {% endif %}
+
+    <!-- Wieder Trenner -->
+    <li class="breadcrumb__separator">{{ section.settings.breadcrumb_separator }}</li>
+    <li class="breadcrumb__item" aria-current="page">
+      {{ product.title }}
+    </li>
+  </ol>
+</nav>
+
+{% schema %}
+{
+  "name": "Breadcrumbs",
+  "settings": [
+    {
+      "type": "text",
+      "id": "breadcrumb_separator",
+      "label": "Breadcrumb-Trenner",
+      "default": "/"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Breadcrumbs",
+      "category": "Navigation"
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+.breadcrumb {
+  margin-bottom: 1em;
+}
+.breadcrumb__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.breadcrumb__item {
+  font-size: 0.9em;
+}
+.breadcrumb__separator {
+  margin: 0 0.5em;
+}
+
+a {color: #000;
+  text-decoration: none;}
+{% endstylesheet %}

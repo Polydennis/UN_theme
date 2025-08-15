@@ -3167,7 +3167,7 @@
     "main-login": {
       "name": "Login",
       "shop_login_button": {
-        "enable": "Aktivér Log ind med shop"
+        "enable": "Aktiver log ind med shop"
       }
     },
     "main-order": {

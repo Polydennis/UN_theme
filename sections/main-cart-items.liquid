@@ -79,21 +79,15 @@
 
               <tbody>
                 {%- for item in cart.items -%}
-                  <tr
-                    class="cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}"
-                    id="CartItem-{{ item.index | plus: 1 }}"
-                    {% if item.parent_relationship.parent != null %}
-                      aria-label="{{- 'products.product.nested_label' | t: title: item.product.title, parent_title: item.parent_relationship.parent.title | escape -}}"
-                    {% endif %}
-                  >
+                  <tr class="cart-item" id="CartItem-{{ item.index | plus: 1 }}">
                     <td class="cart-item__media">
-                      {% if item.image %}
+                      {% if item.image == item.image %}
                         {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
-                        <a href="{{ item.url }}" class="cart-item__link" aria-hidden="true" tabindex="-1"> </a>
-                        <div class="cart-item__image-container gradient {% if item.parent_relationship.parent == null %}global-media-settings{% endif %}">
+                        <a data-cpcproducturl='{{ item.variant_id }}' href="{{ item.url }}" class="cart-item__link" aria-hidden="true" tabindex="-1"> </a>
+                        <div class="cart-item__image-container gradient global-media-settings">
                           <img
-                            src="{{ item.image | image_url: width: 300 }}"
-                            class="cart-item__image {% if item.parent_relationship.parent != null %}global-media-settings{% endif %}"
+                            data-cpcimageid='{{ item.variant_id }}' src="{{ item.image | image_url: width: 300 }}"
+                            class="cart-item__image"
                             alt="{{ item.image.alt | escape }}"
                             loading="lazy"
                             width="150"
@@ -108,7 +102,7 @@
                         <p class="caption-with-letter-spacing">{{ item.product.vendor }}</p>
                       {%- endif -%}
 
-                      <a href="{{ item.url }}" class="cart-item__name h4 break">{{ item.product.title | escape }}</a>
+                      <a data-cpcproducturl='{{ item.variant_id }}' href="{{ item.url }}" class="cart-item__name h4 break"><cpc class='product_title' data-id='{{ item.variant_id }}'>{{ item.product.title | escape | cpc_modified }}</cpc></a>
 
                       {%- if item.original_price != item.final_price -%}
                         <div class="cart-item__discounted-prices">
@@ -116,18 +110,18 @@
                             {{ 'products.product.price.regular_price' | t }}
                           </span>
                           <s class="cart-item__old-price product-option">
-                            {{- item.original_price | money -}}
+                            <cpc class='original_price' data-id='{{ item.variant_id }}'>{{- item.original_price | money | cpc_modified -}}</cpc>
                           </s>
                           <span class="visually-hidden">
                             {{ 'products.product.price.sale_price' | t }}
                           </span>
                           <strong class="cart-item__final-price product-option">
-                            {{ item.final_price | money }}
+                            <cpc class='line_price' data-id='{{ item.variant_id }}'>{{ item.final_price | money | cpc_modified }}</cpc>
                           </strong>
                         </div>
                       {%- else -%}
                         <div class="product-option">
-                          {{ item.original_price | money }}
+                          <cpc class='original_price' data-id='{{ item.variant_id }}'>{{ item.original_price | money | cpc_modified }}</cpc>
                         </div>
                       {%- endif -%}
 
@@ -138,10 +132,12 @@
                         <dl>
                           {%- if item.product.has_only_default_variant == false -%}
                             {%- for option in item.options_with_values -%}
-                              <div class="product-option">
-                                <dt>{{ option.name }}:</dt>
-                                <dd>{{ option.value }}</dd>
-                              </div>
+                              {% unless option.value contains 'Default_cpc_' %}
+                                <div class="product-option">
+                                  <dt>{{ option.name }}:</dt>
+                                  <dd>{{ option.value }}</dd>
+                                </div>
+                              {% endunless%} 
                             {%- endfor -%}
                           {%- endif -%}
 
@@ -187,24 +183,35 @@
                             </dt>
                             <dd>
                               <s class="cart-item__old-price price price--end">
-                                {{ item.original_line_price | money }}
+                                <cpc class='original_line_price' data-id='{{ item.variant_id }}'>{{ item.original_line_price | money | cpc_modified }}</cpc>
                               </s>
                             </dd>
                             <dt class="visually-hidden">
                               {{ 'products.product.price.sale_price' | t }}
                             </dt>
                             <dd class="price price--end">
-                              {{ item.final_line_price | money }}
+                              <cpc class='final_line_price' data-id='{{ item.variant_id }}'>{{ item.final_line_price | money | cpc_modified }}</cpc>
                             </dd>
                           </dl>
                         {%- else -%}
                           <span class="price price--end">
-                            {{ item.original_line_price | money }}
+                            <cpc class='original_line_price' data-id='{{ item.variant_id }}'>{{ item.original_line_price | money | cpc_modified }}</cpc>
                           </span>
                         {%- endif -%}
 
                         {%- if item.variant.available and item.unit_price_measurement -%}
-                          {% render 'unit-price', price: item.unit_price, measurement: item.unit_price_measurement %}
+                          <div class="unit-price caption">
+                            <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                            {{ item.unit_price | money }}
+                            <span aria-hidden="true">/</span>
+                            <span class="visually-hidden"
+                              >&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span
+                            >
+                            {%- if item.unit_price_measurement.reference_value != 1 -%}
+                              {{- item.unit_price_measurement.reference_value -}}
+                            {%- endif -%}
+                            {{ item.unit_price_measurement.reference_unit }}
+                          </div>
                         {%- endif -%}
                       </div>
                     </td>
@@ -236,15 +243,7 @@
                               </button>
                             {%- endif -%}
                             <quantity-input class="quantity cart-quantity">
-                              {% assign can_update_quantity = item.instructions.can_update_quantity | default: true %}
-                              <button
-                                class="quantity__button"
-                                name="minus"
-                                type="button"
-                                {% if can_update_quantity == false %}
-                                  disabled
-                                {% endif %}
-                              >
+                              <button class="quantity__button" name="minus" type="button">
                                 <span class="visually-hidden">
                                   {{- 'products.product.quantity.decrease' | t: product: item.product.title | escape -}}
                                 </span>
@@ -270,18 +269,8 @@
                                 aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
                                 id="Quantity-{{ item.index | plus: 1 }}"
                                 data-index="{{ item.index | plus: 1 }}"
-                                {% if can_update_quantity == false %}
-                                  disabled
-                                {% endif %}
                               >
-                              <button
-                                class="quantity__button"
-                                name="plus"
-                                type="button"
-                                {% if can_update_quantity == false %}
-                                  disabled
-                                {% endif %}
-                              >
+                              <button class="quantity__button" name="plus" type="button">
                                 <span class="visually-hidden">
                                   {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
                                 </span>
@@ -294,13 +283,9 @@
                           <cart-remove-button
                             id="Remove-{{ item.index | plus: 1 }}"
                             data-index="{{ item.index | plus: 1 }}"
-                            {% assign can_remove = item.instructions.can_remove | default: true %}
-                            {% if can_remove == false %}
-                              class="hidden"
-                            {% endif %}
                           >
                             <a
-                              href="{{ item.url_to_remove }}"
+                              data-cpcproducturl='{{ item.variant_id }}' href="{{ item.url_to_remove }}"
                               class="button button--tertiary"
                               aria-label="{{ 'sections.cart.remove_title' | t: title: item.title | escape }}"
                             >
@@ -414,24 +399,35 @@
                             </dt>
                             <dd>
                               <s class="cart-item__old-price price price--end">
-                                {{ item.original_line_price | money }}
+                                <cpc class='original_line_price' data-id='{{ item.variant_id }}'>{{ item.original_line_price | money | cpc_modified }}</cpc>
                               </s>
                             </dd>
                             <dt class="visually-hidden">
                               {{ 'products.product.price.sale_price' | t }}
                             </dt>
                             <dd class="price price--end">
-                              {{ item.final_line_price | money }}
+                              <cpc class='final_line_price' data-id='{{ item.variant_id }}'>{{ item.final_line_price | money | cpc_modified }}</cpc>
                             </dd>
                           </dl>
                         {%- else -%}
                           <span class="price price--end">
-                            {{ item.original_line_price | money }}
+                            <cpc class='original_line_price' data-id='{{ item.variant_id }}'>{{ item.original_line_price | money | cpc_modified }}</cpc>
                           </span>
                         {%- endif -%}
 
                         {%- if item.variant.available and item.unit_price_measurement -%}
-                          {% render 'unit-price', price: item.unit_price, measurement: item.unit_price_measurement %}
+                          <div class="unit-price caption">
+                            <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                            {{ item.unit_price | money }}
+                            <span aria-hidden="true">/</span>
+                            <span class="visually-hidden"
+                              >&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span
+                            >
+                            {%- if item.unit_price_measurement.reference_value != 1 -%}
+                              {{- item.unit_price_measurement.reference_value -}}
+                            {%- endif -%}
+                            {{ item.unit_price_measurement.reference_unit }}
+                          </div>
                         {%- endif -%}
                       </div>
                     </td>
