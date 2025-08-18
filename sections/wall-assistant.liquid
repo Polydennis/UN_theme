@@ -32,8 +32,8 @@
             <line data-el="hl-height" class="hl" x1="40" y1="40"  x2="40"  y2="240"></line>
 
             <!-- Dachschrägen -->
-            <polyline data-el="slope-left"  class="slope ghost" points="40,80 80,40"></polyline>
-            <polyline data-el="slope-right" class="slope ghost" points="320,40 360,80"></polyline>
+            <polyline data-el="slope-left"  class="slope" points="40,80 80,40" hidden></polyline>
+            <polyline data-el="slope-right" class="slope" points="320,40 360,80" hidden></polyline>
 
             <!-- Bemaßung -->
             <line data-el="dim-w" class="dim" x1="40" y1="252" x2="360" y2="252" marker-start="url(#wa-{{ section.id }}-arrow)" marker-end="url(#wa-{{ section.id }}-arrow)"></line>
@@ -181,10 +181,6 @@
     }
     .slope.active {
       stroke: var(--wall-accent, #39b54a);
-    }
-    .slope.ghost {
-      stroke: #a8a8a8;
-      stroke-dasharray: 8 8;
     }
 
     .dim {
