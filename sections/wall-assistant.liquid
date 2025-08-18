@@ -1,0 +1,265 @@
+{% comment %}
+  sections/wall-assistant.liquid
+  Mess-Assistent – als Section einfügbar, JS ausgelagert nach assets/wall-assistant.js
+{% endcomment %}
+
+<section
+  class="page-width"
+  data-section-type="wall-assistant"
+  data-section-id="{{ section.id }}"
+  data-enable-slopes="{{ section.settings.enable_slopes }}"
+  data-return-url="{{ section.settings.return_url | default: routes.all_products_collection_url }}"
+  style="--wall-accent: {{ section.settings.accent_color }};"
+>
+  <div class="grid grid--1-col">
+    <div class="grid__item">
+      <div class="content-for-assistant">
+        <!-- Schematische Wanddarstellung -->
+        <figure class="wall-sketch" aria-hidden="true" data-el="sketch">
+          <svg viewBox="0 0 400 280" role="img" focusable="false">
+            <defs>
+              <marker id="wa-{{ section.id }}-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z"></path>
+              </marker>
+            </defs>
+
+            <!-- dynamischer Innenrahmen -->
+            <rect data-el="rect-fill"   class="sketch-fill"  x="40" y="40" width="320" height="200"></rect>
+            <rect data-el="rect-stroke" class="sketch-frame" x="40" y="40" width="320" height="200"></rect>
+
+            <!-- Highlights der aktiven Kanten -->
+            <line data-el="hl-width"  class="hl" x1="40" y1="240" x2="360" y2="240"></line>
+            <line data-el="hl-height" class="hl" x1="40" y1="40"  x2="40"  y2="240"></line>
+
+            <!-- Dachschrägen -->
+            <polyline data-el="slope-left"  class="slope ghost" points="40,80 80,40"></polyline>
+            <polyline data-el="slope-right" class="slope ghost" points="320,40 360,80"></polyline>
+
+            <!-- Bemaßung -->
+            <line data-el="dim-w" class="dim" x1="40" y1="252" x2="360" y2="252" marker-start="url(#wa-{{ section.id }}-arrow)" marker-end="url(#wa-{{ section.id }}-arrow)"></line>
+            <text data-el="dim-w-text" class="dim-text" x="200" y="266" text-anchor="middle">–</text>
+
+            <line data-el="dim-h" class="dim" x1="28" y1="40" x2="28" y2="240" marker-start="url(#wa-{{ section.id }}-arrow)" marker-end="url(#wa-{{ section.id }}-arrow)"></line>
+            <text data-el="dim-h-text" class="dim-text" x="16" y="140" text-anchor="middle" transform="rotate(-90 16 140)">–</text>
+          </svg>
+        </figure>
+
+        <!-- Stepper -->
+        <div class="assistant" data-step="intro">
+          <h1 class="h1">{{ section.settings.intro_title }}</h1>
+          <p>{{ section.settings.intro_text }}</p>
+          <button class="button button--primary" data-next>Weiter</button>
+        </div>
+
+        <form class="assistant" data-step="slopes" hidden>
+          <fieldset class="field">
+            <legend class="h3">Hat die Wand Dachschrägen?</legend>
+            <label class="radio"><input type="radio" name="slopes" value="none" checked> Nein</label>
+            <label class="radio"><input type="radio" name="slopes" value="left"> Ja, links</label>
+            <label class="radio"><input type="radio" name="slopes" value="right"> Ja, rechts</label>
+            <label class="radio"><input type="radio" name="slopes" value="both"> Ja, beidseitig</label>
+          </fieldset>
+          <div class="assistant__nav">
+            <button type="button" class="button button--secondary" data-prev>Zurück</button>
+            <button type="button" class="button button--primary" data-next>Weiter</button>
+          </div>
+        </form>
+
+        <form class="assistant" data-step="width" hidden>
+          <div class="field">
+            <label class="field__label" for="wall-width-{{ section.id }}">Breite der Wand</label>
+            <input
+              id="wall-width-{{ section.id }}"
+              data-el="input-width"
+              class="field__input"
+              inputmode="decimal"
+              pattern="[0-9]+([\\.,][0-9]+)?"
+              placeholder="z. B. 400"
+              aria-describedby="unit-w-{{ section.id }}"
+            >
+          </div>
+          <div id="unit-w-{{ section.id }}" class="text-subdued">cm</div>
+          <div class="assistant__nav">
+            <button type="button" class="button button--secondary" data-prev>Zurück</button>
+            <button type="button" class="button button--primary" data-next>Weiter</button>
+          </div>
+        </form>
+
+        <form class="assistant" data-step="height" hidden>
+          <div class="field">
+            <label class="field__label" for="wall-height-{{ section.id }}">Höhe der Wand</label>
+            <input
+              id="wall-height-{{ section.id }}"
+              data-el="input-height"
+              class="field__input"
+              inputmode="decimal"
+              pattern="[0-9]+([\\.,][0-9]+)?"
+              placeholder="z. B. 240"
+              aria-describedby="unit-h-{{ section.id }}"
+            >
+          </div>
+          <div id="unit-h-{{ section.id }}" class="text-subdued">cm</div>
+          <div class="assistant__nav">
+            <button type="button" class="button button--secondary" data-prev>Zurück</button>
+            <button type="button" class="button button--primary" data-next>Weiter</button>
+          </div>
+        </form>
+
+        <div class="assistant" data-step="summary" hidden>
+          <h3>Das sind deine Maße:</h3>
+          <ul class="list-unstyled" data-el="summary-list"></ul>
+          <div class="assistant__nav">
+            <button type="button" class="button button--secondary" data-prev>Zurück</button>
+            <button type="button" class="button button--primary" data-el="save-and-go">
+              {{ section.settings.summary_cta_label }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .assistant:not([hidden]) {
+      animation: fade 150ms ease-in;
+    }
+    .assistant__nav {
+      display: flex;
+      gap: var(--spacer, 12px);
+      margin-top: 1rem;
+    }
+    .radio {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    @keyframes fade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Sketch */
+    .wall-sketch {
+      max-width: 460px;
+      margin: 0.5rem 0 1rem;
+    }
+    .wall-sketch svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .sketch-frame {
+      stroke: var(--color-foreground, #555);
+      stroke-width: 4;
+      fill: none;
+    }
+    .sketch-fill {
+      fill: currentColor;
+      opacity: 0.03;
+    }
+
+    .hl {
+      stroke: var(--wall-accent, #39b54a);
+      stroke-width: 6;
+      stroke-linecap: round;
+      display: none;
+    }
+    [data-highlight='width'] .hl[data-el='hl-width'] {
+      display: inline;
+    }
+    [data-highlight='height'] .hl[data-el='hl-height'] {
+      display: inline;
+    }
+
+    .slope {
+      stroke-width: 6;
+      stroke-linecap: round;
+      fill: none;
+    }
+    .slope.active {
+      stroke: var(--wall-accent, #39b54a);
+    }
+    .slope.ghost {
+      stroke: #a8a8a8;
+      stroke-dasharray: 8 8;
+    }
+
+    .dim {
+      stroke: #a8a8a8;
+      stroke-width: 2.5;
+      display: none;
+    }
+    .dim.active {
+      stroke: var(--wall-accent, #39b54a);
+    }
+    .dim-text {
+      fill: var(--wall-accent, #39b54a);
+      font-weight: 600;
+      font-size: 12px;
+      display: none;
+    }
+    .dim-text.muted {
+      fill: #a8a8a8;
+      font-weight: 500;
+    }
+    .show {
+      display: inline !important;
+    }
+  </style>
+</section>
+
+{{ 'wall-assistant.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "Mess-Assistent (Wand)",
+  "class": "section-wall-assistant",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_slopes",
+      "label": "Schritt „Dachschrägen“ anzeigen",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "return_url",
+      "label": "Weiterleitung nach Speichern",
+      "info": "Wenn leer, geht es zur Produktübersicht."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Akzentfarbe (Highlights)",
+      "default": "#39b54a"
+    },
+    {
+      "type": "text",
+      "id": "intro_title",
+      "label": "Intro-Überschrift",
+      "default": "Willkommen"
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro-Text",
+      "default": "<p>Zusammen vermessen wir deine Wand. Besorg dir ein Maßband, Zollstock, Laser oder eine AR-App.</p>"
+    },
+    {
+      "type": "text",
+      "id": "summary_cta_label",
+      "label": "CTA-Text im Ergebnis",
+      "default": "Weiter"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mess-Assistent (Wand)",
+      "category": "Unik"
+    }
+  ]
+}
+{% endschema %}
