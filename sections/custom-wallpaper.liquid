@@ -1,18 +1,19 @@
 {% comment %}
   Section allowing customers to order wallpaper made to measure.
   Customers enter width and height; price is calculated at 24.9 per m².
+  Quantity is sent as square centimetres (variant price should be per cm²).
   Dimensions are stored as line item properties.
 {% endcomment %}
 
 <section id="custom-wallpaper" class="page-width">
   <div class="grid grid--1-col">
     <div class="field">
-      <label for="cw-width">Breite (m)</label>
-      <input id="cw-width" data-wallpaper-width type="number" min="0.1" step="0.01" value="1">
+      <label for="cw-width">Breite (cm)</label>
+      <input id="cw-width" data-wallpaper-width type="number" min="1" step="1" value="100">
     </div>
     <div class="field">
-      <label for="cw-height">Höhe (m)</label>
-      <input id="cw-height" data-wallpaper-height type="number" min="0.1" step="0.01" value="1">
+      <label for="cw-height">Höhe (cm)</label>
+      <input id="cw-height" data-wallpaper-height type="number" min="1" step="1" value="100">
     </div>
     <div class="field">
       <strong>Preis:</strong> <span data-wallpaper-price></span>
@@ -21,10 +22,12 @@
 
   <form id="wallpaper-form" method="post" action="/cart/add">
     <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" />
+    <input type="hidden" name="quantity" value="1" data-wallpaper-quantity />
     <input type="hidden" name="properties[Breite]" data-wallpaper-prop-width />
     <input type="hidden" name="properties[Höhe]" data-wallpaper-prop-height />
     <input type="hidden" name="properties[Fläche]" data-wallpaper-prop-area />
     <input type="hidden" name="properties[SKU]" data-wallpaper-prop-sku />
+    <input type="hidden" data-wallpaper-base-sku value="{{ product.selected_or_first_available_variant.sku }}" />
     <button type="submit" class="button">In den Warenkorb</button>
   </form>
 
