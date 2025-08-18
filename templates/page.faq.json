@@ -78,6 +78,18 @@
         "padding_bottom": 52
       }
     },
+    "wall_assistant_9YEcwR": {
+      "type": "wall-assistant",
+      "name": "Mess-Assistent (Wand)",
+      "settings": {
+        "enable_slopes": true,
+        "return_url": "",
+        "accent_color": "#39b54a",
+        "intro_title": "Willkommen",
+        "intro_text": "<p>Zusammen vermessen wir deine Wand. Besorg dir ein Maßband, Zollstock, Laser oder eine AR-App.</p>",
+        "summary_cta_label": "Weiter"
+      }
+    },
     "custom_liquid_EwHVjr": {
       "type": "custom-liquid",
       "disabled": true,
@@ -1074,6 +1086,7 @@
     "rich_text_xDffDg",
     "custom_liquid_JKKqDW",
     "rich_text_CQJk4h",
+    "wall_assistant_9YEcwR",
     "custom_liquid_EwHVjr",
     "collapsible_content_kxeTda",
     "collapsible_content_iAyk78",
