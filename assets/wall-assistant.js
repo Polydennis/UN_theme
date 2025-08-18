@@ -111,19 +111,18 @@
     }
 
     function updateSlopes() {
-      if (!enableSlopes) {
-        SL && SL.classList.add('ghost');
-        SR && SR.classList.add('ghost');
-        return;
-      }
-      const mode = state.slopes || 'none';
+      const mode = enableSlopes ? state.slopes || 'none' : 'none';
       toggleSlope(SL, mode === 'left' || mode === 'both');
       toggleSlope(SR, mode === 'right' || mode === 'both');
     }
     function toggleSlope(el, active) {
       if (!el) return;
       el.classList.toggle('active', !!active);
-      el.classList.toggle('ghost', !active);
+      if (active) {
+        el.removeAttribute('hidden');
+      } else {
+        el.setAttribute('hidden', '');
+      }
     }
 
     function showDimensions(activeStep) {
