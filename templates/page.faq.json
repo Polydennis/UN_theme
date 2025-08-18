@@ -83,7 +83,7 @@
       "name": "Mess-Assistent (Wand)",
       "settings": {
         "enable_slopes": true,
-        "return_url": "",
+        "return_url": "shopify://collections/alle-tapeten",
         "accent_color": "#39b54a",
         "intro_title": "Willkommen",
         "intro_text": "<p>Zusammen vermessen wir deine Wand. Besorg dir ein Maßband, Zollstock, Laser oder eine AR-App.</p>",
