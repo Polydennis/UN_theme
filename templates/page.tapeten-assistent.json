@@ -49,7 +49,7 @@
         "return_url": "shopify://pages/unsere-tapeten",
         "accent_color": "#6d725e",
         "intro_title": "Willkommen",
-        "intro_text": "<p>Noch ist es nur eine Wand. <br/>Besorg dir bitte einen Zollstock, ein Maßband, einen Laser oder eine AR-Mess-App und gleich hast du die Tapete, die du brauchst.</p>",
+        "intro_text": "<p><strong>Noch ist es nur eine Wand - aber schon bald kann es dein neuer Stolz sein!</strong> <br/>Besorg dir bitte einen Zollstock, ein Maßband, einen Laser oder eine AR-Mess-App und gleich hast du die Tapete, die du brauchst.</p>",
         "summary_cta_label": "Weiter"
       }
     },
