@@ -32,8 +32,16 @@
             <line data-el="hl-height" class="hl" x1="40" y1="40"  x2="40"  y2="240"></line>
 
             <!-- Dachschrägen -->
-            <polyline data-el="slope-left"  class="slope ghost" points="40,80 80,40"></polyline>
-            <polyline data-el="slope-right" class="slope ghost" points="320,40 360,80"></polyline>
+            <polyline data-el="slope-left"  class="slope" points="40,80 80,40" hidden></polyline>
+            <polyline data-el="slope-right" class="slope" points="320,40 360,80" hidden></polyline>
+
+            <!-- Messhilfen für Dachschrägen -->
+            <line data-el="sl-left-peak" class="slope-guide"></line>
+            <line data-el="sl-left-offset" class="slope-guide"></line>
+            <line data-el="sl-left-start" class="slope-guide"></line>
+            <line data-el="sl-right-peak" class="slope-guide"></line>
+            <line data-el="sl-right-offset" class="slope-guide"></line>
+            <line data-el="sl-right-start" class="slope-guide"></line>
 
             <!-- Bemaßung -->
             <line data-el="dim-w" class="dim" x1="40" y1="252" x2="360" y2="252" marker-start="url(#wa-{{ section.id }}-arrow)" marker-end="url(#wa-{{ section.id }}-arrow)"></line>
@@ -74,6 +82,8 @@
               class="field__input"
               inputmode="decimal"
               pattern="[0-9]+([\\.,][0-9]+)?"
+              min="100"
+              max="700"
               placeholder="z. B. 400"
               aria-describedby="unit-w-{{ section.id }}"
             >
@@ -94,11 +104,51 @@
               class="field__input"
               inputmode="decimal"
               pattern="[0-9]+([\\.,][0-9]+)?"
+              min="100"
+              max="400"
               placeholder="z. B. 240"
               aria-describedby="unit-h-{{ section.id }}"
             >
           </div>
           <div id="unit-h-{{ section.id }}" class="text-subdued">cm</div>
+          <div class="assistant__nav">
+            <button type="button" class="button button--secondary" data-prev>Zurück</button>
+            <button type="button" class="button button--primary" data-next>Weiter</button>
+          </div>
+        </form>
+
+        <form class="assistant" data-step="slope-left" hidden>
+          <div class="field">
+            <label class="field__label" for="slope-left-peak-{{ section.id }}">Höchster Punkt (Boden bis Ecke)</label>
+            <input id="slope-left-peak-{{ section.id }}" data-el="input-left-peak" class="field__input" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]+)?" placeholder="z. B. 250">
+          </div>
+          <div class="field">
+            <label class="field__label" for="slope-left-offset-{{ section.id }}">Abstand zur rechten Wand</label>
+            <input id="slope-left-offset-{{ section.id }}" data-el="input-left-offset" class="field__input" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]+)?" placeholder="z. B. 120">
+          </div>
+          <div class="field">
+            <label class="field__label" for="slope-left-start-{{ section.id }}">Höhe, an der die Schräge beginnt</label>
+            <input id="slope-left-start-{{ section.id }}" data-el="input-left-start" class="field__input" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]+)?" placeholder="z. B. 90">
+          </div>
+          <div class="assistant__nav">
+            <button type="button" class="button button--secondary" data-prev>Zurück</button>
+            <button type="button" class="button button--primary" data-next>Weiter</button>
+          </div>
+        </form>
+
+        <form class="assistant" data-step="slope-right" hidden>
+          <div class="field">
+            <label class="field__label" for="slope-right-peak-{{ section.id }}">Höchster Punkt (Boden bis Ecke)</label>
+            <input id="slope-right-peak-{{ section.id }}" data-el="input-right-peak" class="field__input" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]+)?" placeholder="z. B. 250">
+          </div>
+          <div class="field">
+            <label class="field__label" for="slope-right-offset-{{ section.id }}">Abstand zur linken Wand</label>
+            <input id="slope-right-offset-{{ section.id }}" data-el="input-right-offset" class="field__input" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]+)?" placeholder="z. B. 120">
+          </div>
+          <div class="field">
+            <label class="field__label" for="slope-right-start-{{ section.id }}">Höhe, an der die Schräge beginnt</label>
+            <input id="slope-right-start-{{ section.id }}" data-el="input-right-start" class="field__input" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]+)?" placeholder="z. B. 90">
+          </div>
           <div class="assistant__nav">
             <button type="button" class="button button--secondary" data-prev>Zurück</button>
             <button type="button" class="button button--primary" data-next>Weiter</button>
@@ -152,8 +202,8 @@
       display: block;
     }
     .sketch-frame {
-      stroke: var(--color-foreground, #555);
-      stroke-width: 4;
+      stroke: #888;
+      stroke-width: 2;
       fill: none;
     }
     .sketch-fill {
@@ -194,6 +244,12 @@
     }
     .dim.active {
       stroke: var(--wall-accent, #39b54a);
+    }
+    .slope-guide {
+      stroke: var(--wall-accent, #39b54a);
+      stroke-width: 2;
+      stroke-dasharray: 6 6;
+      display: none;
     }
     .dim-text {
       fill: var(--wall-accent, #39b54a);
