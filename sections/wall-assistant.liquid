@@ -86,6 +86,7 @@
               min="100"
               max="700"
               placeholder="z. B. 400"
+              value="100"
               aria-describedby="unit-w-{{ section.id }}"
             >
             <label class="field__label" for="wall-width-{{ section.id }}">Breite der Wand</label>
@@ -108,6 +109,7 @@
               min="100"
               max="400"
               placeholder="z. B. 240"
+              value="100"
               aria-describedby="unit-h-{{ section.id }}"
             >
             <label class="field__label" for="wall-height-{{ section.id }}">Höchster Punkt der Wand</label>
@@ -166,6 +168,7 @@
         <div class="assistant" data-step="summary" hidden>
           <h3>Das sind deine Maße:</h3>
           <ul class="list-unstyled" data-el="summary-list"></ul>
+          <p class="text-subdued" data-el="rounding-note" hidden></p>
           <div class="assistant__nav">
             <button type="button" class="button button--secondary" data-prev>Zurück</button>
             <button type="button" class="button button--primary" data-el="save-and-go">
