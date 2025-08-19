@@ -74,6 +74,8 @@
               class="field__input"
               inputmode="decimal"
               pattern="[0-9]+([\\.,][0-9]+)?"
+              min="100"
+              max="700"
               placeholder="z. B. 400"
               aria-describedby="unit-w-{{ section.id }}"
             >
@@ -94,6 +96,8 @@
               class="field__input"
               inputmode="decimal"
               pattern="[0-9]+([\\.,][0-9]+)?"
+              min="100"
+              max="400"
               placeholder="z. B. 240"
               aria-describedby="unit-h-{{ section.id }}"
             >
@@ -152,8 +156,8 @@
       display: block;
     }
     .sketch-frame {
-      stroke: var(--color-foreground, #555);
-      stroke-width: 4;
+      stroke: #888;
+      stroke-width: 2;
       fill: none;
     }
     .sketch-fill {
