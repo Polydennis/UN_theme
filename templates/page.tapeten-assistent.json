@@ -48,6 +48,18 @@
         "padding_bottom": 52
       }
     },
+    "wall_assistant_L37B3n": {
+      "type": "wall-assistant",
+      "name": "Mess-Assistent (Wand)",
+      "settings": {
+        "enable_slopes": true,
+        "return_url": "shopify://pages/unsere-tapeten",
+        "accent_color": "#6d725e",
+        "intro_title": "Willkommen",
+        "intro_text": "<p>Zusammen vermessen wir deine Wand. Besorg dir ein Maßband, Zollstock, Laser oder eine AR-App.</p>",
+        "summary_cta_label": "Weiter"
+      }
+    },
     "contact_section_jdyKJ6": {
       "type": "contact-section",
       "blocks": {
@@ -88,6 +100,7 @@
   "order": [
     "main",
     "rich_text_LrYhiB",
+    "wall_assistant_L37B3n",
     "contact_section_jdyKJ6"
   ]
 }
