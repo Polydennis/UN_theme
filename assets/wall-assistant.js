@@ -50,7 +50,17 @@
 
     let steps = ['intro'];
     if (enableSlopes) steps.push('slopes');
-    steps = steps.concat(['width', 'height', 'slope-left', 'slope-right', 'summary']);
+    steps = steps.concat([
+      'width',
+      'height',
+      'slope-left-peak',
+      'slope-left-offset',
+      'slope-left-start',
+      'slope-right-peak',
+      'slope-right-offset',
+      'slope-right-start',
+      'summary',
+    ]);
 
     let state = load() || {
       v: 1,
@@ -164,8 +174,8 @@
       let hl = 'intro';
       if (step === 'width') hl = 'width';
       else if (step === 'height') hl = 'height';
-      else if (step === 'slope-left') hl = 'slope-left';
-      else if (step === 'slope-right') hl = 'slope-right';
+      else if (step.startsWith('slope-left')) hl = 'slope-left';
+      else if (step.startsWith('slope-right')) hl = 'slope-right';
       sketch.setAttribute('data-highlight', hl);
       showDimensions(step);
       updateSlopes();
@@ -174,19 +184,19 @@
 
     function stepApplicable(name) {
       if (name === 'slopes') return enableSlopes;
-      if (name === 'slope-left') return state.slopes === 'left' || state.slopes === 'both';
-      if (name === 'slope-right') return state.slopes === 'right' || state.slopes === 'both';
+      if (name.startsWith('slope-left')) return state.slopes === 'left' || state.slopes === 'both';
+      if (name.startsWith('slope-right')) return state.slopes === 'right' || state.slopes === 'both';
       return true;
     }
 
     function updateSlopeGuides() {
       const step = currentStep();
-      toggleShow(SLH, step === 'slope-left');
-      toggleShow(SLO, step === 'slope-left');
-      toggleShow(SLS, step === 'slope-left');
-      toggleShow(SRH, step === 'slope-right');
-      toggleShow(SRO, step === 'slope-right');
-      toggleShow(SRS, step === 'slope-right');
+      toggleShow(SLH, step === 'slope-left-peak');
+      toggleShow(SLO, step === 'slope-left-offset');
+      toggleShow(SLS, step === 'slope-left-start');
+      toggleShow(SRH, step === 'slope-right-peak');
+      toggleShow(SRO, step === 'slope-right-offset');
+      toggleShow(SRS, step === 'slope-right-start');
     }
 
     function updateSlopes() {
