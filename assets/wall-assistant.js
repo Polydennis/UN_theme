@@ -31,14 +31,26 @@
     const DWT = qs(root, '[data-el="dim-w-text"]');
     const DH = qs(root, '[data-el="dim-h"]');
     const DHT = qs(root, '[data-el="dim-h-text"]');
+    const SLH = qs(root, '[data-el="sl-left-peak"]');
+    const SLO = qs(root, '[data-el="sl-left-offset"]');
+    const SLS = qs(root, '[data-el="sl-left-start"]');
+    const SRH = qs(root, '[data-el="sl-right-peak"]');
+    const SRO = qs(root, '[data-el="sl-right-offset"]');
+    const SRS = qs(root, '[data-el="sl-right-start"]');
     const wIn = qs(root, '[data-el="input-width"]');
     const hIn = qs(root, '[data-el="input-height"]');
+    const lpIn = qs(root, '[data-el="input-left-peak"]');
+    const loIn = qs(root, '[data-el="input-left-offset"]');
+    const lsIn = qs(root, '[data-el="input-left-start"]');
+    const rpIn = qs(root, '[data-el="input-right-peak"]');
+    const roIn = qs(root, '[data-el="input-right-offset"]');
+    const rsIn = qs(root, '[data-el="input-right-start"]');
     const summaryList = qs(root, '[data-el="summary-list"]');
     const saveBtn = qs(root, '[data-el="save-and-go"]');
 
     let steps = ['intro'];
     if (enableSlopes) steps.push('slopes');
-    steps = steps.concat(['width', 'height', 'summary']);
+    steps = steps.concat(['width', 'height', 'slope-left', 'slope-right', 'summary']);
 
     let state = load() || {
       v: 1,
@@ -49,6 +61,8 @@
       cutouts: [],
       oversize_cm: 0,
       notes: '',
+      slopeLeft: { peak: null, offset: null, start: null },
+      slopeRight: { peak: null, offset: null, start: null },
     };
 
     // Navigation via Buttons
@@ -64,8 +78,12 @@
         if (cur === 'slopes') state.slopes = getRadio(root, 'slopes');
       }
 
-      const idx = steps.indexOf(cur);
-      const to = steps[idx + (next ? 1 : -1)];
+      let idx = steps.indexOf(cur);
+      let to;
+      do {
+        idx += next ? 1 : -1;
+        to = steps[idx];
+      } while (to && !stepApplicable(to));
       if (to) {
         showStep(root, to, steps);
         highlightForStep(to);
@@ -95,6 +113,36 @@
         save(state);
       })
     );
+    lpIn &&
+      lpIn.addEventListener('input', () => {
+        state.slopeLeft.peak = getNumber(lpIn);
+        updateSketchGeometry();
+      });
+    loIn &&
+      loIn.addEventListener('input', () => {
+        state.slopeLeft.offset = getNumber(loIn);
+        updateSketchGeometry();
+      });
+    lsIn &&
+      lsIn.addEventListener('input', () => {
+        state.slopeLeft.start = getNumber(lsIn);
+        updateSketchGeometry();
+      });
+    rpIn &&
+      rpIn.addEventListener('input', () => {
+        state.slopeRight.peak = getNumber(rpIn);
+        updateSketchGeometry();
+      });
+    roIn &&
+      roIn.addEventListener('input', () => {
+        state.slopeRight.offset = getNumber(roIn);
+        updateSketchGeometry();
+      });
+    rsIn &&
+      rsIn.addEventListener('input', () => {
+        state.slopeRight.start = getNumber(rsIn);
+        updateSketchGeometry();
+      });
 
     // Save & redirect
     if (saveBtn) {
@@ -113,9 +161,32 @@
 
     function highlightForStep(step) {
       if (!sketch) return;
-      sketch.setAttribute('data-highlight', step === 'width' ? 'width' : step === 'height' ? 'height' : 'intro');
+      let hl = 'intro';
+      if (step === 'width') hl = 'width';
+      else if (step === 'height') hl = 'height';
+      else if (step === 'slope-left') hl = 'slope-left';
+      else if (step === 'slope-right') hl = 'slope-right';
+      sketch.setAttribute('data-highlight', hl);
       showDimensions(step);
       updateSlopes();
+      updateSlopeGuides();
+    }
+
+    function stepApplicable(name) {
+      if (name === 'slopes') return enableSlopes;
+      if (name === 'slope-left') return state.slopes === 'left' || state.slopes === 'both';
+      if (name === 'slope-right') return state.slopes === 'right' || state.slopes === 'both';
+      return true;
+    }
+
+    function updateSlopeGuides() {
+      const step = currentStep();
+      toggleShow(SLH, step === 'slope-left');
+      toggleShow(SLO, step === 'slope-left');
+      toggleShow(SLS, step === 'slope-left');
+      toggleShow(SRH, step === 'slope-right');
+      toggleShow(SRO, step === 'slope-right');
+      toggleShow(SRS, step === 'slope-right');
     }
 
     function updateSlopes() {
@@ -193,10 +264,47 @@
         DHT.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
       }
 
-      // Schrägen an Ecken binden (20% der kleineren Kante)
-      const L = Math.max(18, Math.min(rw, rh) * 0.22);
-      setPolyline(SL, `${rx},${ry + L} ${rx + L},${ry}`);
-      setPolyline(SR, `${rx + rw - L},${ry} ${rx + rw},${ry + L}`);
+      const scale = isPos(state.width) ? rw / state.width : 1;
+
+      // Linke Schräge
+      if (SL) {
+        if (state.slopes === 'left' || state.slopes === 'both') {
+          const peak = isPos(state.slopeLeft.peak) ? state.slopeLeft.peak : state.height || 0;
+          const offset = isPos(state.slopeLeft.offset) ? state.slopeLeft.offset : state.width * 0.2;
+          const start = isPos(state.slopeLeft.start) ? state.slopeLeft.start : state.height * 0.6;
+          const xPeak = rx + rw - offset * scale;
+          const yPeak = ry + rh - peak * scale;
+          const xStart = rx;
+          const yStart = ry + rh - start * scale;
+          setPolyline(SL, `${xStart},${yStart} ${xPeak},${yPeak}`);
+          setLine(SLH, xPeak, yPeak, xPeak, ry + rh);
+          setLine(SLO, xPeak, yPeak, rx + rw, yPeak);
+          setLine(SLS, rx, yStart, rx, ry + rh);
+        } else {
+          const L = Math.max(18, Math.min(rw, rh) * 0.22);
+          setPolyline(SL, `${rx},${ry + L} ${rx + L},${ry}`);
+        }
+      }
+
+      // Rechte Schräge
+      if (SR) {
+        if (state.slopes === 'right' || state.slopes === 'both') {
+          const peak = isPos(state.slopeRight.peak) ? state.slopeRight.peak : state.height || 0;
+          const offset = isPos(state.slopeRight.offset) ? state.slopeRight.offset : state.width * 0.2;
+          const start = isPos(state.slopeRight.start) ? state.slopeRight.start : state.height * 0.6;
+          const xPeak = rx + offset * scale;
+          const yPeak = ry + rh - peak * scale;
+          const xStart = rx + rw;
+          const yStart = ry + rh - start * scale;
+          setPolyline(SR, `${xPeak},${yPeak} ${xStart},${yStart}`);
+          setLine(SRH, xPeak, yPeak, xPeak, ry + rh);
+          setLine(SRO, rx, yPeak, xPeak, yPeak);
+          setLine(SRS, rx + rw, yStart, rx + rw, ry + rh);
+        } else {
+          const L = Math.max(18, Math.min(rw, rh) * 0.22);
+          setPolyline(SR, `${rx + rw - L},${ry} ${rx + rw},${ry + L}`);
+        }
+      }
     }
 
     function renderSummary() {
@@ -208,6 +316,8 @@
         <li><strong>Breite:</strong> ${state.width ?? '–'} cm</li>
         <li><strong>Höhe:</strong> ${state.height ?? '–'} cm</li>
         <li><strong>Dachschrägen:</strong> ${slopeLabel}</li>
+        ${state.slopes === 'left' || state.slopes === 'both' ? `<li><strong>Linke Schräge:</strong> Höhe ${state.slopeLeft.peak ?? '–'} cm, Abstand ${state.slopeLeft.offset ?? '–'} cm, Beginn bei ${state.slopeLeft.start ?? '–'} cm</li>` : ''}
+        ${state.slopes === 'right' || state.slopes === 'both' ? `<li><strong>Rechte Schräge:</strong> Höhe ${state.slopeRight.peak ?? '–'} cm, Abstand ${state.slopeRight.offset ?? '–'} cm, Beginn bei ${state.slopeRight.start ?? '–'} cm</li>` : ''}
         <li><strong>Fläche (vereinfacht):</strong> ${m2.toFixed(2)} m²</li>`;
     }
 
@@ -220,8 +330,26 @@
       if (r) r.checked = true;
       state.slopes = loaded.slopes;
     }
+    if (loaded?.slopeLeft) {
+      lpIn && loaded.slopeLeft.peak && (lpIn.value = String(loaded.slopeLeft.peak).replace('.', ','));
+      loIn && loaded.slopeLeft.offset && (loIn.value = String(loaded.slopeLeft.offset).replace('.', ','));
+      lsIn && loaded.slopeLeft.start && (lsIn.value = String(loaded.slopeLeft.start).replace('.', ','));
+      state.slopeLeft = { ...state.slopeLeft, ...loaded.slopeLeft };
+    }
+    if (loaded?.slopeRight) {
+      rpIn && loaded.slopeRight.peak && (rpIn.value = String(loaded.slopeRight.peak).replace('.', ','));
+      roIn && loaded.slopeRight.offset && (roIn.value = String(loaded.slopeRight.offset).replace('.', ','));
+      rsIn && loaded.slopeRight.start && (rsIn.value = String(loaded.slopeRight.start).replace('.', ','));
+      state.slopeRight = { ...state.slopeRight, ...loaded.slopeRight };
+    }
     state.width = getNumber(wIn);
     state.height = getNumber(hIn);
+    state.slopeLeft.peak = getNumber(lpIn);
+    state.slopeLeft.offset = getNumber(loIn);
+    state.slopeLeft.start = getNumber(lsIn);
+    state.slopeRight.peak = getNumber(rpIn);
+    state.slopeRight.offset = getNumber(roIn);
+    state.slopeRight.start = getNumber(rsIn);
 
     showStep(root, 'intro', steps);
     highlightForStep('intro');
