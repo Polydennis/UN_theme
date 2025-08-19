@@ -111,19 +111,21 @@
     }
 
     function updateSlopes() {
-      if (!enableSlopes) {
-        SL && SL.classList.add('ghost');
-        SR && SR.classList.add('ghost');
-        return;
-      }
-      const mode = state.slopes || 'none';
-      toggleSlope(SL, mode === 'left' || mode === 'both');
-      toggleSlope(SR, mode === 'right' || mode === 'both');
+      const step = currentStep();
+      const mode = enableSlopes ? state.slopes || 'none' : 'none';
+      const showGhosts = enableSlopes && step === 'slopes';
+      toggleSlope(SL, mode === 'left' || mode === 'both', showGhosts);
+      toggleSlope(SR, mode === 'right' || mode === 'both', showGhosts);
     }
-    function toggleSlope(el, active) {
+    function toggleSlope(el, active, showGhosts) {
       if (!el) return;
       el.classList.toggle('active', !!active);
-      el.classList.toggle('ghost', !active);
+      el.classList.toggle('ghost', !active && showGhosts);
+      if (active || (!active && showGhosts)) {
+        el.removeAttribute('hidden');
+      } else {
+        el.setAttribute('hidden', '');
+      }
     }
 
     function showDimensions(activeStep) {
