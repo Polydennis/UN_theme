@@ -32,8 +32,8 @@
             <line data-el="hl-height" class="hl" x1="40" y1="40"  x2="40"  y2="240"></line>
 
             <!-- Dachschrägen -->
-            <polyline data-el="slope-left"  class="slope ghost" points="40,80 80,40"></polyline>
-            <polyline data-el="slope-right" class="slope ghost" points="320,40 360,80"></polyline>
+            <polyline data-el="slope-left"  class="slope" points="40,80 80,40" hidden></polyline>
+            <polyline data-el="slope-right" class="slope" points="320,40 360,80" hidden></polyline>
 
             <!-- Bemaßung -->
             <line data-el="dim-w" class="dim" x1="40" y1="252" x2="360" y2="252" marker-start="url(#wa-{{ section.id }}-arrow)" marker-end="url(#wa-{{ section.id }}-arrow)"></line>
@@ -74,6 +74,8 @@
               class="field__input"
               inputmode="decimal"
               pattern="[0-9]+([\\.,][0-9]+)?"
+              min="100"
+              max="700"
               placeholder="z. B. 400"
               aria-describedby="unit-w-{{ section.id }}"
             >
@@ -94,6 +96,8 @@
               class="field__input"
               inputmode="decimal"
               pattern="[0-9]+([\\.,][0-9]+)?"
+              min="100"
+              max="400"
               placeholder="z. B. 240"
               aria-describedby="unit-h-{{ section.id }}"
             >
@@ -152,8 +156,8 @@
       display: block;
     }
     .sketch-frame {
-      stroke: var(--color-foreground, #555);
-      stroke-width: 4;
+      stroke: #888;
+      stroke-width: 2;
       fill: none;
     }
     .sketch-fill {

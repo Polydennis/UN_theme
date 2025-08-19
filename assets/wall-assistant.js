@@ -5,6 +5,10 @@
   const STORAGE_KEY = 'wall.measurements.v1';
   const COOKIE_NAME = 'wall_measurements';
   const BOX = { x: 40, y: 40, w: 320, h: 200 }; // Zeichenfläche für das Rechteck
+  const MIN_WIDTH = 100;
+  const MAX_WIDTH = 700;
+  const MIN_HEIGHT = 100;
+  const MAX_HEIGHT = 400;
 
   const roots = document.querySelectorAll('[data-section-type="wall-assistant"]');
   if (!roots.length) return;
@@ -54,7 +58,11 @@
       if (!next && !prev) return;
 
       const cur = currentStep();
-      if (cur === 'slopes' && next) state.slopes = getRadio(root, 'slopes');
+      if (next) {
+        if (cur === 'width' && !validateDim('width')) return;
+        if (cur === 'height' && !validateDim('height')) return;
+        if (cur === 'slopes') state.slopes = getRadio(root, 'slopes');
+      }
 
       const idx = steps.indexOf(cur);
       const to = steps[idx + (next ? 1 : -1)];
@@ -88,10 +96,7 @@
     // Save & redirect
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
-        if (!validate()) {
-          alert('Bitte sinnvolle Zahlen für Breite und Höhe eingeben.');
-          return;
-        }
+        if (!validateDim('width') || !validateDim('height')) return;
         save(state);
         if (returnUrl) location.href = returnUrl;
       });
@@ -111,19 +116,21 @@
     }
 
     function updateSlopes() {
-      if (!enableSlopes) {
-        SL && SL.classList.add('ghost');
-        SR && SR.classList.add('ghost');
-        return;
-      }
-      const mode = state.slopes || 'none';
-      toggleSlope(SL, mode === 'left' || mode === 'both');
-      toggleSlope(SR, mode === 'right' || mode === 'both');
+      const step = currentStep();
+      const mode = enableSlopes ? state.slopes || 'none' : 'none';
+      const showGhosts = enableSlopes && step === 'slopes';
+      toggleSlope(SL, mode === 'left' || mode === 'both', showGhosts);
+      toggleSlope(SR, mode === 'right' || mode === 'both', showGhosts);
     }
-    function toggleSlope(el, active) {
+    function toggleSlope(el, active, showGhosts) {
       if (!el) return;
       el.classList.toggle('active', !!active);
-      el.classList.toggle('ghost', !active);
+      el.classList.toggle('ghost', !active && showGhosts);
+      if (active || (!active && showGhosts)) {
+        el.removeAttribute('hidden');
+      } else {
+        el.setAttribute('hidden', '');
+      }
     }
 
     function showDimensions(activeStep) {
@@ -246,6 +253,23 @@
     }
     function toggleShow(node, on) {
       node && node.classList.toggle('show', !!on);
+    }
+
+    function validateDim(kind) {
+      const v = kind === 'width' ? state.width : state.height;
+      const min = kind === 'width' ? MIN_WIDTH : MIN_HEIGHT;
+      const max = kind === 'width' ? MAX_WIDTH : MAX_HEIGHT;
+      if (!isPos(v)) {
+        alert(`Bitte eine ${kind === 'width' ? 'Breite' : 'Höhe'} in Zentimetern eingeben.`);
+        return false;
+      }
+      if (v < min || v > max) {
+        alert(
+          `Die ${kind === 'width' ? 'Breite' : 'Höhe'} muss zwischen ${min} und ${max} cm liegen.\nKontaktiere uns gern für Sonderlösungen: https://unik-nordic.com/pages/kontakt`
+        );
+        return false;
+      }
+      return true;
     }
 
     function setRect(node, x, y, w, h) {
