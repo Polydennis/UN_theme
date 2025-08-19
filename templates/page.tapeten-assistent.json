@@ -23,20 +23,13 @@
         "heading_MtfNPE": {
           "type": "heading",
           "settings": {
-            "heading": "Wir sind nur eine Nachricht entfernt! 💛",
+            "heading": "Das Vermessen deiner Wand ist in einer Minute erledigt!",
             "heading_size": "h2"
-          }
-        },
-        "text_rgGWwr": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Du hast eine Frage, bist unsicher bei der Auswahl oder brauchst Hilfe bei deinem Projekt? Dann schreib Sindy gern direkt – Wir sind persönlich für dich da und helfen dir gern weiter. Egal ob es um Maße, Materialien oder kreative Ideen geht. Wir finden mit dir gemeinsam die beste Lösung.</p>"
           }
         }
       },
       "block_order": [
-        "heading_MtfNPE",
-        "text_rgGWwr"
+        "heading_MtfNPE"
       ],
       "name": "t:sections.rich-text.presets.name",
       "settings": {
@@ -45,7 +38,7 @@
         "color_scheme": "",
         "full_width": true,
         "padding_top": 40,
-        "padding_bottom": 52
+        "padding_bottom": 0
       }
     },
     "wall_assistant_L37B3n": {
