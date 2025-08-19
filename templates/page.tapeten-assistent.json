@@ -31,6 +31,7 @@
       "block_order": [
         "heading_MtfNPE"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.presets.name",
       "settings": {
         "desktop_content_position": "center",
@@ -48,7 +49,7 @@
         "enable_slopes": true,
         "return_url": "shopify://pages/unsere-tapeten",
         "accent_color": "#6d725e",
-        "intro_title": "Willkommen",
+        "intro_title": "Lass uns das Richtige für dich finden!",
         "intro_text": "<p><strong>Noch ist es nur eine Wand - aber schon bald kann es dein neuer Stolz sein!</strong> <br/>Besorg dir bitte einen Zollstock, ein Maßband, einen Laser oder eine AR-Mess-App und gleich hast du die Tapete, die du brauchst.</p>",
         "summary_cta_label": "Weiter"
       }
