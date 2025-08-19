@@ -79,17 +79,20 @@
         state.width = getNumber(wIn);
         updateSketchGeometry();
         showDimensions('width');
+        save(state);
       });
     hIn &&
       hIn.addEventListener('input', () => {
         state.height = getNumber(hIn);
         updateSketchGeometry();
         showDimensions('height');
+        save(state);
       });
     root.querySelectorAll('input[name="slopes"]').forEach((r) =>
       r.addEventListener('change', () => {
         state.slopes = getRadio(root, 'slopes');
         updateSlopes();
+        save(state);
       })
     );
 
