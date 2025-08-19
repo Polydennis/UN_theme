@@ -7,12 +7,14 @@
 <section id="custom-wallpaper" class="page-width">
   <div class="grid grid--1-col">
     <div class="field">
-      <label for="cw-width">Breite (m)</label>
-      <input id="cw-width" data-wallpaper-width type="number" min="0.1" step="0.01" value="1">
+      <label for="cw-width">Breite (cm)</label>
+      <input id="cw-width" data-wallpaper-width type="number" min="100" max="700" step="1" value="100">
+      <div class="info-bubble text-subdued" data-info-width hidden></div>
     </div>
     <div class="field">
-      <label for="cw-height">Höhe (m)</label>
-      <input id="cw-height" data-wallpaper-height type="number" min="0.1" step="0.01" value="1">
+      <label for="cw-height">Höhe (cm)</label>
+      <input id="cw-height" data-wallpaper-height type="number" min="100" max="400" step="1" value="100">
+      <div class="info-bubble text-subdued" data-info-height hidden></div>
     </div>
     <div class="field">
       <strong>Preis:</strong> <span data-wallpaper-price></span>
@@ -30,6 +32,9 @@
   </form>
 
   <script src="{{ 'custom-wallpaper.js' | asset_url }}" defer></script>
+  <style>
+    .info-bubble { margin-top: 0.25rem; font-size: 0.875rem; }
+  </style>
 </section>
 
 {% schema %}

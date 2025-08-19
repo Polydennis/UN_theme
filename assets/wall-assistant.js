@@ -45,6 +45,7 @@
     const roIn = qs(root, '[data-el="input-right-offset"]');
     const rsIn = qs(root, '[data-el="input-right-start"]');
     const summaryList = qs(root, '[data-el="summary-list"]');
+    const roundingNote = qs(root, '[data-el="rounding-note"]');
     const saveBtn = qs(root, '[data-el="save-and-go"]');
 
     let steps = ['intro'];
@@ -59,18 +60,19 @@
       'summary',
     ]);
 
-    let state = load() || {
-      v: 1,
-      unit: 'cm',
-      width: null,
-      height: null,
-      slopes: 'none',
-      cutouts: [],
-      oversize_cm: 0,
-      notes: '',
-      slopeLeft: { offset: null, start: null },
-      slopeRight: { offset: null, start: null },
-    };
+    let state =
+      load() || {
+        v: 1,
+        unit: 'cm',
+        width: 100,
+        height: 100,
+        slopes: 'none',
+        cutouts: [],
+        oversize_cm: 0,
+        notes: '',
+        slopeLeft: { offset: null, start: null },
+        slopeRight: { offset: null, start: null },
+      };
 
     // Navigation via Buttons
     root.addEventListener('click', (e) => {
@@ -99,6 +101,8 @@
     });
 
     // Live Inputs
+    let wTimer;
+    let hTimer;
     wIn &&
       wIn.addEventListener('input', () => {
         state.width = getNumber(wIn);
@@ -106,6 +110,8 @@
         updateSlopeGuides();
         showDimensions('width');
         save(state);
+        clearTimeout(wTimer);
+        wTimer = setTimeout(() => roundInput('width'), 2000);
       });
     hIn &&
       hIn.addEventListener('input', () => {
@@ -114,7 +120,11 @@
         updateSlopeGuides();
         showDimensions('height');
         save(state);
+        clearTimeout(hTimer);
+        hTimer = setTimeout(() => roundInput('height'), 2000);
       });
+    wIn && wIn.addEventListener('blur', () => roundInput('width'));
+    hIn && hIn.addEventListener('blur', () => roundInput('height'));
     root.querySelectorAll('input[name="slopes"]').forEach((r) =>
       r.addEventListener('change', () => {
         state.slopes = getRadio(root, 'slopes');
@@ -356,12 +366,45 @@
         ${state.slopes === 'left' || state.slopes === 'both' ? `<li><strong>Linke Schräge:</strong> Abstand zur rechten Wand ${state.slopeLeft.offset ?? '–'} cm, Abstand zur linken Wand ${leftDist} cm, Beginn bei ${state.slopeLeft.start ?? '–'} cm</li>` : ''}
         ${state.slopes === 'right' || state.slopes === 'both' ? `<li><strong>Rechte Schräge:</strong> Abstand zur linken Wand ${state.slopeRight.offset ?? '–'} cm, Beginn bei ${state.slopeRight.start ?? '–'} cm</li>` : ''}
         <li><strong>Fläche (vereinfacht):</strong> ${m2.toFixed(2)} m²</li>`;
+      if (roundingNote) {
+        roundingNote.textContent =
+          'Wir haben auf den nächsten 10er aufgerundet, damit du beim Tapezieren Beschnittzugabe hast, da viele Wände nicht exakt gerade sind.';
+        roundingNote.hidden = false;
+      }
+    }
+
+    function roundInput(kind) {
+      const input = kind === 'width' ? wIn : hIn;
+      if (!input) return;
+      const min = kind === 'width' ? MIN_WIDTH : MIN_HEIGHT;
+      const max = kind === 'width' ? MAX_WIDTH : MAX_HEIGHT;
+      let v = getNumber(input);
+      if (!Number.isFinite(v)) return;
+      const original = v;
+      let rounded = Math.ceil(v / 10) * 10;
+      if (rounded < min) {
+        rounded = min;
+      }
+      if (rounded > max) {
+        rounded = max;
+      }
+      input.value = String(rounded);
+      state[kind] = rounded;
+      if (original < min || original > max) {
+        alert(`Die ${kind === 'width' ? 'Breite' : 'Höhe'} muss zwischen ${min} und ${max} cm liegen.\nKontaktiere uns gern für Sonderlösungen: https://unik-nordic.com/pages/kontakt`);
+      }
+      updateSketchGeometry();
+      updateSlopeGuides();
+      showDimensions(kind);
+      save(state);
     }
 
     // Init with persisted values
-    const loaded = load();
+    const loaded = state;
     if (loaded?.width) wIn && (wIn.value = String(loaded.width).replace('.', ','));
+    else wIn && (wIn.value = '100');
     if (loaded?.height) hIn && (hIn.value = String(loaded.height).replace('.', ','));
+    else hIn && (hIn.value = '100');
     if (loaded?.slopes) {
       const r = root.querySelector(`input[name="slopes"][value="${loaded.slopes}"]`);
       if (r) r.checked = true;
@@ -383,6 +426,9 @@
     state.slopeLeft.start = getNumber(lsIn);
     state.slopeRight.offset = getNumber(roIn);
     state.slopeRight.start = getNumber(rsIn);
+
+    roundInput('width');
+    roundInput('height');
 
     showStep(root, 'intro', steps);
     highlightForStep('intro');
