@@ -8,6 +8,8 @@
   const propArea = document.querySelector('[data-wallpaper-prop-area]');
   const propSku = document.querySelector('[data-wallpaper-prop-sku]');
   const qtyInput = document.querySelector('[data-wallpaper-quantity]');
+  const formEl = document.getElementById('wallpaper-form');
+  const baseSku = (formEl?.dataset.productSku || '').slice(0, 7);
 
   const currencyFormatter = new Intl.NumberFormat('de-DE', {
     style: 'currency',
@@ -24,7 +26,9 @@
     propWidth.value = `${width.toFixed(2)}m`;
     propHeight.value = `${height.toFixed(2)}m`;
     propArea.value = `${area.toFixed(2)}m²`;
-    propSku.value = `CW-${width.toFixed(2)}x${height.toFixed(2)}`;
+    const widthCm = Math.round(width * 100);
+    const heightCm = Math.round(height * 100);
+    propSku.value = `${baseSku}_${heightCm}_${widthCm}`;
 
     if (qtyInput) {
       qtyInput.value = Math.max(1, Math.round(area * 100));

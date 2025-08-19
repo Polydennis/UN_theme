@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <form id="wallpaper-form" method="post" action="/cart/add">
+  <form id="wallpaper-form" method="post" action="/cart/add" data-product-sku="{{ product.selected_or_first_available_variant.sku | escape }}">
     <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" />
     <input type="hidden" name="quantity" value="1" data-wallpaper-quantity />
     <input type="hidden" name="properties[Breite]" data-wallpaper-prop-width />
