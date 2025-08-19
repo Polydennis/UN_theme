@@ -33,16 +33,15 @@
     const DHT = qs(root, '[data-el="dim-h-text"]');
     const SLH = qs(root, '[data-el="sl-left-peak"]');
     const SLO = qs(root, '[data-el="sl-left-offset"]');
+    const SLL = qs(root, '[data-el="sl-left-offset-left"]');
     const SLS = qs(root, '[data-el="sl-left-start"]');
     const SRH = qs(root, '[data-el="sl-right-peak"]');
     const SRO = qs(root, '[data-el="sl-right-offset"]');
     const SRS = qs(root, '[data-el="sl-right-start"]');
     const wIn = qs(root, '[data-el="input-width"]');
     const hIn = qs(root, '[data-el="input-height"]');
-    const lpIn = qs(root, '[data-el="input-left-peak"]');
     const loIn = qs(root, '[data-el="input-left-offset"]');
     const lsIn = qs(root, '[data-el="input-left-start"]');
-    const rpIn = qs(root, '[data-el="input-right-peak"]');
     const roIn = qs(root, '[data-el="input-right-offset"]');
     const rsIn = qs(root, '[data-el="input-right-start"]');
     const summaryList = qs(root, '[data-el="summary-list"]');
@@ -50,7 +49,15 @@
 
     let steps = ['intro'];
     if (enableSlopes) steps.push('slopes');
-    steps = steps.concat(['width', 'height', 'slope-left', 'slope-right', 'summary']);
+    steps = steps.concat([
+      'width',
+      'height',
+      'slope-left-offset',
+      'slope-left-start',
+      'slope-right-offset',
+      'slope-right-start',
+      'summary',
+    ]);
 
     let state = load() || {
       v: 1,
@@ -61,8 +68,8 @@
       cutouts: [],
       oversize_cm: 0,
       notes: '',
-      slopeLeft: { peak: null, offset: null, start: null },
-      slopeRight: { peak: null, offset: null, start: null },
+      slopeLeft: { offset: null, start: null },
+      slopeRight: { offset: null, start: null },
     };
 
     // Navigation via Buttons
@@ -96,6 +103,7 @@
       wIn.addEventListener('input', () => {
         state.width = getNumber(wIn);
         updateSketchGeometry();
+        updateSlopeGuides();
         showDimensions('width');
         save(state);
       });
@@ -103,6 +111,7 @@
       hIn.addEventListener('input', () => {
         state.height = getNumber(hIn);
         updateSketchGeometry();
+        updateSlopeGuides();
         showDimensions('height');
         save(state);
       });
@@ -110,38 +119,33 @@
       r.addEventListener('change', () => {
         state.slopes = getRadio(root, 'slopes');
         updateSlopes();
+        updateSketchGeometry();
         save(state);
       })
     );
-    lpIn &&
-      lpIn.addEventListener('input', () => {
-        state.slopeLeft.peak = getNumber(lpIn);
-        updateSketchGeometry();
-      });
     loIn &&
       loIn.addEventListener('input', () => {
         state.slopeLeft.offset = getNumber(loIn);
         updateSketchGeometry();
+        updateSlopeGuides();
       });
     lsIn &&
       lsIn.addEventListener('input', () => {
         state.slopeLeft.start = getNumber(lsIn);
         updateSketchGeometry();
-      });
-    rpIn &&
-      rpIn.addEventListener('input', () => {
-        state.slopeRight.peak = getNumber(rpIn);
-        updateSketchGeometry();
+        updateSlopeGuides();
       });
     roIn &&
       roIn.addEventListener('input', () => {
         state.slopeRight.offset = getNumber(roIn);
         updateSketchGeometry();
+        updateSlopeGuides();
       });
     rsIn &&
       rsIn.addEventListener('input', () => {
         state.slopeRight.start = getNumber(rsIn);
         updateSketchGeometry();
+        updateSlopeGuides();
       });
 
     // Save & redirect
@@ -164,8 +168,8 @@
       let hl = 'intro';
       if (step === 'width') hl = 'width';
       else if (step === 'height') hl = 'height';
-      else if (step === 'slope-left') hl = 'slope-left';
-      else if (step === 'slope-right') hl = 'slope-right';
+      else if (step.startsWith('slope-left')) hl = 'slope-left';
+      else if (step.startsWith('slope-right')) hl = 'slope-right';
       sketch.setAttribute('data-highlight', hl);
       showDimensions(step);
       updateSlopes();
@@ -174,19 +178,21 @@
 
     function stepApplicable(name) {
       if (name === 'slopes') return enableSlopes;
-      if (name === 'slope-left') return state.slopes === 'left' || state.slopes === 'both';
-      if (name === 'slope-right') return state.slopes === 'right' || state.slopes === 'both';
+      if (name.startsWith('slope-left')) return state.slopes === 'left' || state.slopes === 'both';
+      if (name.startsWith('slope-right')) return state.slopes === 'right' || state.slopes === 'both';
       return true;
     }
 
     function updateSlopeGuides() {
-      const step = currentStep();
-      toggleShow(SLH, step === 'slope-left');
-      toggleShow(SLO, step === 'slope-left');
-      toggleShow(SLS, step === 'slope-left');
-      toggleShow(SRH, step === 'slope-right');
-      toggleShow(SRO, step === 'slope-right');
-      toggleShow(SRS, step === 'slope-right');
+      const showLeft = state.slopes === 'left' || state.slopes === 'both';
+      const showRight = state.slopes === 'right' || state.slopes === 'both';
+      toggleShow(SLH, showLeft && isPos(state.height));
+      toggleShow(SLO, showLeft && isPos(state.slopeLeft.offset));
+      toggleShow(SLL, showLeft && isPos(state.slopeLeft.offset));
+      toggleShow(SLS, showLeft && isPos(state.slopeLeft.start));
+      toggleShow(SRH, showRight && isPos(state.height));
+      toggleShow(SRO, showRight && isPos(state.slopeRight.offset));
+      toggleShow(SRS, showRight && isPos(state.slopeRight.start));
     }
 
     function updateSlopes() {
@@ -249,16 +255,35 @@
 
       // Highlights (Bottom/Left) an die Kanten binden
       setLine(HLW, rx, ry + rh, rx + rw, ry + rh);
-      setLine(HLH, rx, ry, rx, ry + rh);
+
+      let xPeak = rx;
+      if (state.slopes === 'left' || state.slopes === 'both') {
+        const offset = isPos(state.slopeLeft.offset)
+          ? state.slopeLeft.offset
+          : isPos(state.width)
+          ? state.width * 0.2
+          : 0;
+        xPeak = rx + rw - offset * scale;
+      } else if (state.slopes === 'right') {
+        const offset = isPos(state.slopeRight.offset)
+          ? state.slopeRight.offset
+          : isPos(state.width)
+          ? state.width * 0.2
+          : 0;
+        xPeak = rx + offset * scale;
+      }
+      const yPeak = ry + rh - (state.height || 0) * scale;
+      setLine(HLH, xPeak, ry, xPeak, ry + rh);
 
       // Maße platzieren
       setLine(DW, rx, ry + rh + 12, rx + rw, ry + rh + 12);
       DWT && (DWT.setAttribute('x', rx + rw / 2), DWT.setAttribute('y', ry + rh + 26));
 
-      setLine(DH, rx - 12, ry, rx - 12, ry + rh);
+      const dimX = xPeak - 12;
+      setLine(DH, dimX, yPeak, dimX, ry + rh);
       if (DHT) {
-        const cx = rx - 24,
-          cy = ry + rh / 2;
+        const cx = dimX - 12;
+        const cy = yPeak + (ry + rh - yPeak) / 2;
         DHT.setAttribute('x', cx);
         DHT.setAttribute('y', cy);
         DHT.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
@@ -269,16 +294,21 @@
       // Linke Schräge
       if (SL) {
         if (state.slopes === 'left' || state.slopes === 'both') {
-          const peak = isPos(state.slopeLeft.peak) ? state.slopeLeft.peak : state.height || 0;
-          const offset = isPos(state.slopeLeft.offset) ? state.slopeLeft.offset : state.width * 0.2;
-          const start = isPos(state.slopeLeft.start) ? state.slopeLeft.start : state.height * 0.6;
-          const xPeak = rx + rw - offset * scale;
-          const yPeak = ry + rh - peak * scale;
+          const peak = state.height || 0;
+          const offset = isPos(state.slopeLeft.offset)
+            ? state.slopeLeft.offset
+            : isPos(state.width)
+            ? state.width * 0.2
+            : 0;
+          const start = isPos(state.slopeLeft.start) ? state.slopeLeft.start : (state.height || 0) * 0.6;
+          const xPeakL = rx + rw - offset * scale;
+          const yPeakL = ry + rh - peak * scale;
           const xStart = rx;
           const yStart = ry + rh - start * scale;
-          setPolyline(SL, `${xStart},${yStart} ${xPeak},${yPeak}`);
-          setLine(SLH, xPeak, yPeak, xPeak, ry + rh);
-          setLine(SLO, xPeak, yPeak, rx + rw, yPeak);
+          setPolyline(SL, `${xStart},${yStart} ${xPeakL},${yPeakL}`);
+          setLine(SLH, xPeakL, yPeakL, xPeakL, ry + rh);
+          setLine(SLO, xPeakL, yPeakL, rx + rw, yPeakL);
+          setLine(SLL, rx, yPeakL, xPeakL, yPeakL);
           setLine(SLS, rx, yStart, rx, ry + rh);
         } else {
           const L = Math.max(18, Math.min(rw, rh) * 0.22);
@@ -289,16 +319,20 @@
       // Rechte Schräge
       if (SR) {
         if (state.slopes === 'right' || state.slopes === 'both') {
-          const peak = isPos(state.slopeRight.peak) ? state.slopeRight.peak : state.height || 0;
-          const offset = isPos(state.slopeRight.offset) ? state.slopeRight.offset : state.width * 0.2;
-          const start = isPos(state.slopeRight.start) ? state.slopeRight.start : state.height * 0.6;
-          const xPeak = rx + offset * scale;
-          const yPeak = ry + rh - peak * scale;
+          const peak = state.height || 0;
+          const offset = isPos(state.slopeRight.offset)
+            ? state.slopeRight.offset
+            : isPos(state.width)
+            ? state.width * 0.2
+            : 0;
+          const start = isPos(state.slopeRight.start) ? state.slopeRight.start : (state.height || 0) * 0.6;
+          const xPeakR = rx + offset * scale;
+          const yPeakR = ry + rh - peak * scale;
           const xStart = rx + rw;
           const yStart = ry + rh - start * scale;
-          setPolyline(SR, `${xPeak},${yPeak} ${xStart},${yStart}`);
-          setLine(SRH, xPeak, yPeak, xPeak, ry + rh);
-          setLine(SRO, rx, yPeak, xPeak, yPeak);
+          setPolyline(SR, `${xPeakR},${yPeakR} ${xStart},${yStart}`);
+          setLine(SRH, xPeakR, yPeakR, xPeakR, ry + rh);
+          setLine(SRO, rx, yPeakR, xPeakR, yPeakR);
           setLine(SRS, rx + rw, yStart, rx + rw, ry + rh);
         } else {
           const L = Math.max(18, Math.min(rw, rh) * 0.22);
@@ -312,12 +346,15 @@
       if (!summaryList) return;
       const slopeLabel =
         { none: 'Nein', left: 'Ja, links', right: 'Ja, rechts', both: 'Ja, beidseitig' }[state.slopes] || '–';
+      const leftDist = isPos(state.width) && isPos(state.slopeLeft.offset)
+        ? fmt(state.width - state.slopeLeft.offset)
+        : '–';
       summaryList.innerHTML = `
         <li><strong>Breite:</strong> ${state.width ?? '–'} cm</li>
-        <li><strong>Höhe:</strong> ${state.height ?? '–'} cm</li>
+        <li><strong>Höchster Punkt:</strong> ${state.height ?? '–'} cm</li>
         <li><strong>Dachschrägen:</strong> ${slopeLabel}</li>
-        ${state.slopes === 'left' || state.slopes === 'both' ? `<li><strong>Linke Schräge:</strong> Höhe ${state.slopeLeft.peak ?? '–'} cm, Abstand ${state.slopeLeft.offset ?? '–'} cm, Beginn bei ${state.slopeLeft.start ?? '–'} cm</li>` : ''}
-        ${state.slopes === 'right' || state.slopes === 'both' ? `<li><strong>Rechte Schräge:</strong> Höhe ${state.slopeRight.peak ?? '–'} cm, Abstand ${state.slopeRight.offset ?? '–'} cm, Beginn bei ${state.slopeRight.start ?? '–'} cm</li>` : ''}
+        ${state.slopes === 'left' || state.slopes === 'both' ? `<li><strong>Linke Schräge:</strong> Abstand zur rechten Wand ${state.slopeLeft.offset ?? '–'} cm, Abstand zur linken Wand ${leftDist} cm, Beginn bei ${state.slopeLeft.start ?? '–'} cm</li>` : ''}
+        ${state.slopes === 'right' || state.slopes === 'both' ? `<li><strong>Rechte Schräge:</strong> Abstand zur linken Wand ${state.slopeRight.offset ?? '–'} cm, Beginn bei ${state.slopeRight.start ?? '–'} cm</li>` : ''}
         <li><strong>Fläche (vereinfacht):</strong> ${m2.toFixed(2)} m²</li>`;
     }
 
@@ -331,23 +368,19 @@
       state.slopes = loaded.slopes;
     }
     if (loaded?.slopeLeft) {
-      lpIn && loaded.slopeLeft.peak && (lpIn.value = String(loaded.slopeLeft.peak).replace('.', ','));
       loIn && loaded.slopeLeft.offset && (loIn.value = String(loaded.slopeLeft.offset).replace('.', ','));
       lsIn && loaded.slopeLeft.start && (lsIn.value = String(loaded.slopeLeft.start).replace('.', ','));
       state.slopeLeft = { ...state.slopeLeft, ...loaded.slopeLeft };
     }
     if (loaded?.slopeRight) {
-      rpIn && loaded.slopeRight.peak && (rpIn.value = String(loaded.slopeRight.peak).replace('.', ','));
       roIn && loaded.slopeRight.offset && (roIn.value = String(loaded.slopeRight.offset).replace('.', ','));
       rsIn && loaded.slopeRight.start && (rsIn.value = String(loaded.slopeRight.start).replace('.', ','));
       state.slopeRight = { ...state.slopeRight, ...loaded.slopeRight };
     }
     state.width = getNumber(wIn);
     state.height = getNumber(hIn);
-    state.slopeLeft.peak = getNumber(lpIn);
     state.slopeLeft.offset = getNumber(loIn);
     state.slopeLeft.start = getNumber(lsIn);
-    state.slopeRight.peak = getNumber(rpIn);
     state.slopeRight.offset = getNumber(roIn);
     state.slopeRight.start = getNumber(rsIn);
 
@@ -390,13 +423,14 @@
       const v = kind === 'width' ? state.width : state.height;
       const min = kind === 'width' ? MIN_WIDTH : MIN_HEIGHT;
       const max = kind === 'width' ? MAX_WIDTH : MAX_HEIGHT;
+      const label = kind === 'width' ? 'Breite' : 'Höchster Punkt';
       if (!isPos(v)) {
-        alert(`Bitte eine ${kind === 'width' ? 'Breite' : 'Höhe'} in Zentimetern eingeben.`);
+        alert(`Bitte eine ${label} in Zentimetern eingeben.`);
         return false;
       }
       if (v < min || v > max) {
         alert(
-          `Die ${kind === 'width' ? 'Breite' : 'Höhe'} muss zwischen ${min} und ${max} cm liegen.\nKontaktiere uns gern für Sonderlösungen: https://unik-nordic.com/pages/kontakt`
+          `Die ${label} muss zwischen ${min} und ${max} cm liegen.\nKontaktiere uns gern für Sonderlösungen: https://unik-nordic.com/pages/kontakt`
         );
         return false;
       }
