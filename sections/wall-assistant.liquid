@@ -43,6 +43,7 @@
             <line data-el="sl-right-offset" class="slope-guide"></line>
             <line data-el="sl-right-start" class="slope-guide"></line>
 
+
             <!-- Bemaßung -->
             <line data-el="dim-w" class="dim" x1="40" y1="252" x2="360" y2="252" marker-start="url(#wa-{{ section.id }}-arrow)" marker-end="url(#wa-{{ section.id }}-arrow)"></line>
             <text data-el="dim-w-text" class="dim-text" x="200" y="266" text-anchor="middle">–</text>
@@ -231,10 +232,6 @@
     }
     .slope.active {
       stroke: var(--wall-accent, #39b54a);
-    }
-    .slope.ghost {
-      stroke: #a8a8a8;
-      stroke-dasharray: 8 8;
     }
 
     .dim {
